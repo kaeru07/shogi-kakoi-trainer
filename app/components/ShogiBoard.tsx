@@ -25,7 +25,6 @@ function piecesToBoard(pieces: PiecePosition[]): (PiecePosition | null)[][] {
 export default function ShogiBoard({ pieces, highlight, small = false }: Props) {
   const board = piecesToBoard(pieces)
   const labelSize = small ? 'text-[6px]' : 'text-[9px]'
-  const pieceSize = small ? 'text-[7px]' : 'text-[11px]'
   const labelW = small ? 'w-3' : 'w-4'
 
   return (
@@ -55,20 +54,51 @@ export default function ShogiBoard({ pieces, highlight, small = false }: Props) 
                   key={ci}
                   className={[
                     'flex-1 aspect-square border border-[#A0845C] flex items-center justify-center',
-                    'bg-[#DEB887] relative',
-                    isHighlight ? 'bg-emerald-300' : '',
+                    isHighlight ? 'bg-emerald-300' : 'bg-[#DEB887]',
                   ].join(' ')}
                 >
                   {cell && (
-                    <span
-                      className={[
-                        pieceSize,
-                        'font-bold leading-none select-none',
-                        cell.isGote ? 'rotate-180 inline-block text-[#1a1a1a]' : 'text-[#1a1a1a]',
-                      ].join(' ')}
-                    >
-                      {cell.kanji}
-                    </span>
+                    small ? (
+                      // Small mode: simple text for readability
+                      <span
+                        className={[
+                          'text-[7px] font-bold leading-none select-none',
+                          cell.isGote ? 'rotate-180 inline-block' : '',
+                          'text-[#1a1a1a]',
+                        ].join(' ')}
+                      >
+                        {cell.kanji}
+                      </span>
+                    ) : (
+                      // Normal mode: pentagon piece design
+                      <div
+                        style={{
+                          clipPath: 'polygon(50% 0%, 88% 18%, 100% 100%, 0% 100%, 12% 18%)',
+                          background: 'linear-gradient(175deg, #f5e9c8 30%, #c8a050 100%)',
+                          filter: 'drop-shadow(0 1px 2px rgba(0,0,0,0.35))',
+                          transform: cell.isGote ? 'rotate(180deg)' : 'none',
+                          width: '86%',
+                          height: '86%',
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          paddingTop: '10%',
+                          boxSizing: 'border-box' as const,
+                        }}
+                      >
+                        <span
+                          style={{
+                            fontSize: '11px',
+                            fontWeight: 'bold',
+                            lineHeight: 1,
+                            color: '#1a1a1a',
+                            userSelect: 'none',
+                          }}
+                        >
+                          {cell.kanji}
+                        </span>
+                      </div>
+                    )
                   )}
                 </div>
               )

@@ -13,6 +13,12 @@ export type BoardHighlight = {
   row: number
 }
 
+export type GuideStep = {
+  move: string
+  hint: string
+  highlight?: BoardHighlight
+}
+
 export type Castle = {
   id: string
   name: string
@@ -26,6 +32,8 @@ export type Castle = {
   basicSteps: string[]
   pieces: PiecePosition[]
   guidePieces: PiecePosition[]
+  guideSteps: GuideStep[]
+  // legacy fields kept for compatibility
   guideHighlight?: BoardHighlight
   guideNextMove: string
   guideStep: [number, number]
