@@ -80,7 +80,11 @@ export default function GuideClient({ castle }: Props) {
 
         {/* Board */}
         <div className="bg-[#E8DFC8] rounded-2xl p-3">
-          <ShogiBoard pieces={castle.guidePieces} highlight={currentStepData?.highlight} />
+          <ShogiBoard
+            pieces={currentStepData?.boardPosition ?? castle.guidePieces}
+            highlight={currentStepData?.to ?? currentStepData?.highlight}
+            highlightFrom={currentStepData?.from}
+          />
         </div>
 
         {/* Current move — big display */}
@@ -99,7 +103,13 @@ export default function GuideClient({ castle }: Props) {
           <div className="bg-[#1a2744] text-white rounded-xl p-4 shadow">
             <div className="text-xs opacity-70 mb-1">次の一手</div>
             <div className="text-2xl font-bold tracking-wider">{currentStepData?.move}</div>
-            <div className="text-xs opacity-70 mt-1">手番: ▲（あなた）</div>
+            {currentStepData?.from && currentStepData?.to && (
+              <div className="flex items-center gap-2 mt-2 text-xs opacity-70">
+                <span className="bg-yellow-300 text-yellow-900 px-1.5 py-0.5 rounded font-bold">🟡 動かす駒</span>
+                <span>→</span>
+                <span className="bg-emerald-400 text-emerald-900 px-1.5 py-0.5 rounded font-bold">🟢 移動先</span>
+              </div>
+            )}
           </div>
         )}
 

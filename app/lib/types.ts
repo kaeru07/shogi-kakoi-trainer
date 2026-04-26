@@ -17,6 +17,9 @@ export type GuideStep = {
   move: string
   hint: string
   highlight?: BoardHighlight
+  from?: BoardHighlight
+  to?: BoardHighlight
+  boardPosition?: PiecePosition[]
 }
 
 export type Castle = {

@@ -5,6 +5,7 @@ import type { PiecePosition, BoardHighlight } from '@/app/lib/types'
 type Props = {
   pieces: PiecePosition[]
   highlight?: BoardHighlight
+  highlightFrom?: BoardHighlight
   small?: boolean
 }
 
@@ -22,7 +23,7 @@ function piecesToBoard(pieces: PiecePosition[]): (PiecePosition | null)[][] {
   return board
 }
 
-export default function ShogiBoard({ pieces, highlight, small = false }: Props) {
+export default function ShogiBoard({ pieces, highlight, highlightFrom, small = false }: Props) {
   const board = piecesToBoard(pieces)
   const labelSize = small ? 'text-[6px]' : 'text-[9px]'
   const labelW = small ? 'w-3' : 'w-4'
@@ -49,12 +50,15 @@ export default function ShogiBoard({ pieces, highlight, small = false }: Props) 
               const isHighlight = highlight
                 ? highlight.row - 1 === ri && 9 - highlight.col === ci
                 : false
+              const isHighlightFrom = highlightFrom
+                ? highlightFrom.row - 1 === ri && 9 - highlightFrom.col === ci
+                : false
               return (
                 <div
                   key={ci}
                   className={[
                     'flex-1 aspect-square border border-[#A0845C] flex items-center justify-center',
-                    isHighlight ? 'bg-emerald-300' : 'bg-[#DEB887]',
+                    isHighlight ? 'bg-emerald-300' : isHighlightFrom ? 'bg-yellow-200' : 'bg-[#DEB887]',
                   ].join(' ')}
                 >
                   {cell && (

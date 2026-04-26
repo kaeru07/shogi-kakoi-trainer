@@ -1,4 +1,4 @@
-import type { Castle, PiecePosition } from './types'
+import type { BoardHighlight, Castle, GuideStep, PiecePosition } from './types'
 
 const GOTE_STANDARD: PiecePosition[] = [
   { kanji: '香', col: 9, row: 1, isGote: true },
@@ -125,6 +125,93 @@ const YAGURA_PIECES: PiecePosition[] = [
   { kanji: '香', col: 1, row: 9, isGote: false },
 ]
 
+// --- Guide step helpers ---
+
+function movePiece(
+  pieces: PiecePosition[],
+  from: BoardHighlight,
+  to: BoardHighlight
+): PiecePosition[] {
+  const moving = pieces.find(p => p.col === from.col && p.row === from.row)
+  if (!moving) return pieces
+  return [
+    ...pieces.filter(
+      p => !(p.col === from.col && p.row === from.row) &&
+           !(p.col === to.col && p.row === to.row)
+    ),
+    { ...moving, col: to.col, row: to.row },
+  ]
+}
+
+type MoveSpec = {
+  move: string
+  hint: string
+  from: BoardHighlight | null
+  to: BoardHighlight | null
+}
+
+function buildGuideSteps(initial: PiecePosition[], specs: MoveSpec[]): GuideStep[] {
+  const result: GuideStep[] = []
+  let board = initial
+
+  for (const s of specs) {
+    result.push({
+      move: s.move,
+      hint: s.hint,
+      highlight: s.to ?? undefined,
+      from: s.from ?? undefined,
+      to: s.to ?? undefined,
+      boardPosition: board,
+    })
+    if (s.from && s.to) {
+      board = movePiece(board, s.from, s.to)
+    }
+  }
+
+  return result
+}
+
+// 美濃囲い: 5手の移動 + 完成確認 = 6ステップ
+// boardPosition[i] = ステップiを「次にやること」として見せる盤面（手前の状態）
+const MINO_MOVE_SPECS: MoveSpec[] = [
+  {
+    move: '▲7八銀',
+    hint: '銀を7八に上げます。玉の横を守る最初の一手です。🟡の駒を🟢のマスへ動かしてください。',
+    from: { col: 7, row: 9 },
+    to: { col: 7, row: 8 },
+  },
+  {
+    move: '▲7七銀',
+    hint: '銀をさらに7七へ上げます。玉の斜め前を守る美濃囲いの要の位置です。',
+    from: { col: 7, row: 8 },
+    to: { col: 7, row: 7 },
+  },
+  {
+    move: '▲7八金右',
+    hint: '右の金を7八に上げます。玉の横に金が並び守りが一段と固まります。',
+    from: { col: 6, row: 8 },
+    to: { col: 7, row: 8 },
+  },
+  {
+    move: '▲6九金左',
+    hint: '左の金を6九に寄せます。玉の近くに金を集めて囲いの形を整えます。',
+    from: { col: 4, row: 9 },
+    to: { col: 6, row: 9 },
+  },
+  {
+    move: '▲9六歩',
+    hint: '9筋の歩を突いて端の守りを固めます。最後の仕上げです！',
+    from: { col: 9, row: 7 },
+    to: { col: 9, row: 6 },
+  },
+  {
+    move: '美濃囲い完成！',
+    hint: '玉・金・銀が連携した美濃囲いが完成しました！',
+    from: null,
+    to: null,
+  },
+]
+
 export const CASTLES: Castle[] = [
   {
     id: 'mino',
@@ -158,14 +245,7 @@ export const CASTLES: Castle[] = [
     ],
     pieces: MINO_PIECES,
     guidePieces: MINO_GUIDE_PIECES,
-    guideSteps: [
-      { move: '▲7八銀', hint: '銀を7八に上げて玉の斜め前を守ります。美濃囲いの要の一手です。', highlight: { col: 7, row: 8 } },
-      { move: '▲7七銀', hint: 'さらに銀を7七に上げて美濃の形に近づけます。銀が玉を斜め上から守ります。', highlight: { col: 7, row: 7 } },
-      { move: '▲6七金右', hint: '右の金を6七に上げます。金銀が連携して玉を守る形を作ります。', highlight: { col: 6, row: 7 } },
-      { move: '▲5八金左', hint: '左の金も5八に引き付けます。二枚の金で玉の前面を守ります。', highlight: { col: 5, row: 8 } },
-      { move: '▲9八香', hint: '端の香車を9八に上げて端の守りを固めます。', highlight: { col: 9, row: 8 } },
-      { move: '▲8八玉', hint: '玉を8八に落ち着かせます。金銀に守られた安全地帯——美濃囲いの完成です！', highlight: { col: 8, row: 8 } },
-    ],
+    guideSteps: buildGuideSteps(MINO_GUIDE_PIECES, MINO_MOVE_SPECS),
     guideHighlight: { col: 7, row: 8 },
     guideNextMove: '▲7八銀',
     guideStep: [6, 10],
