@@ -132,13 +132,11 @@ function movePiece(
   from: BoardHighlight,
   to: BoardHighlight
 ): PiecePosition[] {
-  const moving = pieces.find(p => p.col === from.col && p.row === from.row)
-  if (!moving) return pieces
+  const idx = pieces.findIndex(p => p.col === from.col && p.row === from.row)
+  if (idx === -1) return pieces
+  const moving = pieces[idx]
   return [
-    ...pieces.filter(
-      p => !(p.col === from.col && p.row === from.row) &&
-           !(p.col === to.col && p.row === to.row)
-    ),
+    ...pieces.filter((p, i) => i !== idx && !(p.col === to.col && p.row === to.row)),
     { ...moving, col: to.col, row: to.row },
   ]
 }
@@ -212,6 +210,206 @@ const MINO_MOVE_SPECS: MoveSpec[] = [
   },
 ]
 
+// Guide piece starting positions
+const TAKAMINO_GUIDE_PIECES = SIMPLE_CASTLE_PIECES(8, 6, 7, 9)
+const GINKAN_GUIDE_PIECES = SIMPLE_CASTLE_PIECES(7, 7, 6, 9)
+const YAGURA_GUIDE_PIECES = SIMPLE_CASTLE_PIECES(6, 7, 7, 2)
+const FUNE_GUIDE_PIECES = SIMPLE_CASTLE_PIECES(7, 7, 7, 2)
+const IBISHA_ANAGUMA_GUIDE_PIECES = SIMPLE_CASTLE_PIECES(9, 9, 8, 2)
+const FURIBISHA_ANAGUMA_GUIDE_PIECES = SIMPLE_CASTLE_PIECES(1, 1, 2, 7)
+
+// 高美濃: 4手 + 完成
+const TAKAMINO_MOVE_SPECS: MoveSpec[] = [
+  {
+    move: '▲8七銀',
+    hint: '銀を8七に上げます。高美濃特有の銀の位置です。🟡の駒を🟢のマスへ動かしてください。',
+    from: { col: 7, row: 7 },
+    to: { col: 8, row: 7 },
+  },
+  {
+    move: '▲7八金右',
+    hint: '右の金を7八に上げます。玉の横に金を配置して守りを厚くします。',
+    from: { col: 6, row: 8 },
+    to: { col: 7, row: 8 },
+  },
+  {
+    move: '▲7九金左',
+    hint: '左の金を7九に引き付けます。金二枚で玉の下を固めます。',
+    from: { col: 6, row: 9 },
+    to: { col: 7, row: 9 },
+  },
+  {
+    move: '▲9六歩',
+    hint: '9筋の歩を突いて端の守りを固めます。最後の仕上げです！',
+    from: { col: 9, row: 7 },
+    to: { col: 9, row: 6 },
+  },
+  {
+    move: '高美濃囲い完成！',
+    hint: '銀が8七、金が7八・7九に配置された高美濃囲いが完成しました！',
+    from: null,
+    to: null,
+  },
+]
+
+// 銀冠: 3手 + 完成
+const GINKAN_MOVE_SPECS: MoveSpec[] = [
+  {
+    move: '▲7七銀',
+    hint: '銀を7七に上げます。玉の頭を守る銀冠の核心です。🟡の駒を🟢のマスへ動かしてください。',
+    from: { col: 6, row: 7 },
+    to: { col: 7, row: 7 },
+  },
+  {
+    move: '▲7九金左',
+    hint: '左の金を7九に引き付けます。玉の下を金で固めます。',
+    from: { col: 6, row: 9 },
+    to: { col: 7, row: 9 },
+  },
+  {
+    move: '▲9六歩',
+    hint: '9筋の歩を突いて端の守りを固めます。',
+    from: { col: 9, row: 7 },
+    to: { col: 9, row: 6 },
+  },
+  {
+    move: '銀冠完成！',
+    hint: '銀が玉の頭を守る銀冠が完成しました！',
+    from: null,
+    to: null,
+  },
+]
+
+// 矢倉: 3手 + 完成
+const YAGURA_MOVE_SPECS: MoveSpec[] = [
+  {
+    move: '▲6七銀',
+    hint: '銀を6七に引き付けます。飛車先を守りながら矢倉の陣形を整えます。🟡の駒を🟢のマスへ動かしてください。',
+    from: { col: 7, row: 7 },
+    to: { col: 6, row: 7 },
+  },
+  {
+    move: '▲7九金左',
+    hint: '左の金を7九に引き付けます。玉の下を金で固めます。',
+    from: { col: 6, row: 9 },
+    to: { col: 7, row: 9 },
+  },
+  {
+    move: '▲9六歩',
+    hint: '9筋の歩を突いて端の守りを固めます。矢倉囲いの完成です！',
+    from: { col: 9, row: 7 },
+    to: { col: 9, row: 6 },
+  },
+  {
+    move: '矢倉囲い完成！',
+    hint: '金銀4枚の堅固な矢倉囲いが完成しました！',
+    from: null,
+    to: null,
+  },
+]
+
+// 舟囲い: 4手 + 完成
+const FUNE_MOVE_SPECS: MoveSpec[] = [
+  {
+    move: '▲6七銀',
+    hint: '銀を6七に上げます。舟囲いは素早く組める機動性が特長。🟡の駒を🟢のマスへ動かしてください。',
+    from: { col: 7, row: 7 },
+    to: { col: 6, row: 7 },
+  },
+  {
+    move: '▲5九金左',
+    hint: '左の金を5九に寄せます。玉の左下を守ります。',
+    from: { col: 6, row: 9 },
+    to: { col: 5, row: 9 },
+  },
+  {
+    move: '▲9六歩',
+    hint: '9筋の歩を突いて端を固めます。',
+    from: { col: 9, row: 7 },
+    to: { col: 9, row: 6 },
+  },
+  {
+    move: '▲4六歩',
+    hint: '4筋の歩も突いて中央付近の守りを固めます。',
+    from: { col: 4, row: 7 },
+    to: { col: 4, row: 6 },
+  },
+  {
+    move: '舟囲い完成！',
+    hint: '素早く組める舟囲いが完成しました！速い展開に対応できます。',
+    from: null,
+    to: null,
+  },
+]
+
+// 居飛車穴熊: 4手 + 完成
+const IBISHA_ANAGUMA_MOVE_SPECS: MoveSpec[] = [
+  {
+    move: '▲8八銀',
+    hint: '銀を8八に上げます。玉の斜め前を守る穴熊の急所です。🟡の駒を🟢のマスへ動かしてください。',
+    from: { col: 8, row: 7 },
+    to: { col: 8, row: 8 },
+  },
+  {
+    move: '▲7九金',
+    hint: '金を7九に引き付けます。玉の左下を金で固めます。',
+    from: { col: 6, row: 9 },
+    to: { col: 7, row: 9 },
+  },
+  {
+    move: '▲9六歩',
+    hint: '9筋の歩を突いて端を固めます。',
+    from: { col: 9, row: 7 },
+    to: { col: 9, row: 6 },
+  },
+  {
+    move: '▲5六歩',
+    hint: '5筋の歩も突いて中央の守りを固めます。',
+    from: { col: 5, row: 7 },
+    to: { col: 5, row: 6 },
+  },
+  {
+    move: '居飛車穴熊完成！',
+    hint: '最堅の守りを誇る居飛車穴熊が完成しました！端の堅さは抜群です。',
+    from: null,
+    to: null,
+  },
+]
+
+// 振り飛車穴熊: 4手 + 完成
+const FURIBISHA_ANAGUMA_MOVE_SPECS: MoveSpec[] = [
+  {
+    move: '▲2八銀',
+    hint: '銀を2八に上げます。玉の斜め前を守る振り飛車穴熊の要です。🟡の駒を🟢のマスへ動かしてください。',
+    from: { col: 2, row: 7 },
+    to: { col: 2, row: 8 },
+  },
+  {
+    move: '▲3九金',
+    hint: '金を3九に引き付けます。玉の右下から守りを固めます。',
+    from: { col: 6, row: 9 },
+    to: { col: 3, row: 9 },
+  },
+  {
+    move: '▲1六歩',
+    hint: '1筋の歩を突いて端の守りを固めます。',
+    from: { col: 1, row: 7 },
+    to: { col: 1, row: 6 },
+  },
+  {
+    move: '▲9六歩',
+    hint: '9筋の歩も突いて守りを整えます。振り飛車穴熊完成！',
+    from: { col: 9, row: 7 },
+    to: { col: 9, row: 6 },
+  },
+  {
+    move: '振り飛車穴熊完成！',
+    hint: '振り飛車最強の守りを誇る振り飛車穴熊が完成しました！',
+    from: null,
+    to: null,
+  },
+]
+
 export const CASTLES: Castle[] = [
   {
     id: 'mino',
@@ -280,15 +478,8 @@ export const CASTLES: Castle[] = [
     recommendedAgainst: '持久戦志向の居飛車党',
     basicSteps: ['▲7六歩', '▲6八玉', '▲7八玉', '▲8八玉', '▲7八銀', '▲7七銀'],
     pieces: SIMPLE_CASTLE_PIECES(8, 7, 7, 9),
-    guidePieces: SIMPLE_CASTLE_PIECES(8, 6, 7, 9),
-    guideSteps: [
-      { move: '▲7八銀', hint: '銀を7八に上げます。美濃から高美濃へ発展する第一歩。', highlight: { col: 7, row: 8 } },
-      { move: '▲8七銀', hint: '銀をさらに8七に上げます。高美濃の特徴的な形になります。', highlight: { col: 8, row: 7 } },
-      { move: '▲6七金右', hint: '右の金を6七に上げて守りを厚くします。', highlight: { col: 6, row: 7 } },
-      { move: '▲7九金左', hint: '左の金を7九に引き付けます。', highlight: { col: 7, row: 9 } },
-      { move: '▲9八香', hint: '端の香車を9八に上げて端の守りを固めます。', highlight: { col: 9, row: 8 } },
-      { move: '▲8八玉', hint: '玉を8八に収めます。銀冠に守られた高美濃囲いの完成です！', highlight: { col: 8, row: 8 } },
-    ],
+    guidePieces: TAKAMINO_GUIDE_PIECES,
+    guideSteps: buildGuideSteps(TAKAMINO_GUIDE_PIECES, TAKAMINO_MOVE_SPECS),
     guideHighlight: { col: 7, row: 8 },
     guideNextMove: '▲7八銀',
     guideStep: [5, 8],
@@ -315,15 +506,8 @@ export const CASTLES: Castle[] = [
     recommendedAgainst: '居飛車・振り飛車どちらにも',
     basicSteps: ['▲7六歩', '▲6八銀', '▲5七銀', '▲4八玉', '▲3八玉', '▲2八玉'],
     pieces: SIMPLE_CASTLE_PIECES(7, 6, 6, 9),
-    guidePieces: SIMPLE_CASTLE_PIECES(7, 7, 6, 9),
-    guideSteps: [
-      { move: '▲6八銀', hint: '銀を6八に上げます。玉の移動への準備です。', highlight: { col: 6, row: 8 } },
-      { move: '▲5七銀', hint: '銀をさらに5七に上げます。中央付近での銀の活用。', highlight: { col: 5, row: 7 } },
-      { move: '▲4八玉', hint: '玉を4八に移動します。銀の守りに向かって動き始めます。', highlight: { col: 4, row: 8 } },
-      { move: '▲3八玉', hint: '玉を3八にさらに引きます。', highlight: { col: 3, row: 8 } },
-      { move: '▲2八玉', hint: '玉を2八まで寄せます。', highlight: { col: 2, row: 8 } },
-      { move: '▲3七銀', hint: '銀を3七に戻して玉の頭を守ります。銀冠囲いの完成です！', highlight: { col: 3, row: 7 } },
-    ],
+    guidePieces: GINKAN_GUIDE_PIECES,
+    guideSteps: buildGuideSteps(GINKAN_GUIDE_PIECES, GINKAN_MOVE_SPECS),
     guideHighlight: { col: 6, row: 8 },
     guideNextMove: '▲6八銀',
     guideStep: [4, 8],
@@ -350,17 +534,8 @@ export const CASTLES: Castle[] = [
     recommendedAgainst: '相居飛車（矢倉戦）',
     basicSteps: ['▲7六歩', '▲6八銀', '▲7七銀', '▲6九玉', '▲7九玉', '▲6八金'],
     pieces: YAGURA_PIECES,
-    guidePieces: SIMPLE_CASTLE_PIECES(6, 7, 7, 2),
-    guideSteps: [
-      { move: '▲6八銀', hint: '銀を6八に上げます。矢倉への準備の第一歩。', highlight: { col: 6, row: 8 } },
-      { move: '▲7七銀', hint: '銀を7七に上げます。飛車先の歩を銀で守る重要な一手。', highlight: { col: 7, row: 7 } },
-      { move: '▲6九玉', hint: '玉を6九に移動します。矢倉囲いへ向けて玉が動き始めます。', highlight: { col: 6, row: 9 } },
-      { move: '▲7九玉', hint: '玉を7九に移動。銀の守りに近付きます。', highlight: { col: 7, row: 9 } },
-      { move: '▲7八金右', hint: '右の金を7八に上げます。玉の前面を守ります。', highlight: { col: 7, row: 8 } },
-      { move: '▲6八金左', hint: '左の金も6八に引き付けます。金二枚で玉を護衛。', highlight: { col: 6, row: 8 } },
-      { move: '▲6七銀右', hint: '銀を6七に引き上げて守りを整えます。', highlight: { col: 6, row: 7 } },
-      { move: '▲7八銀', hint: '最後に銀を7八に配置。金銀4枚の矢倉囲いが完成です！', highlight: { col: 7, row: 8 } },
-    ],
+    guidePieces: YAGURA_GUIDE_PIECES,
+    guideSteps: buildGuideSteps(YAGURA_GUIDE_PIECES, YAGURA_MOVE_SPECS),
     guideHighlight: { col: 6, row: 8 },
     guideNextMove: '▲6八玉',
     guideStep: [7, 12],
@@ -387,14 +562,8 @@ export const CASTLES: Castle[] = [
     recommendedAgainst: '速攻志向の相手',
     basicSteps: ['▲7六歩', '▲6八玉', '▲7八玉', '▲5八金右', '▲4八銀', '▲3八銀'],
     pieces: SIMPLE_CASTLE_PIECES(7, 6, 7, 2),
-    guidePieces: SIMPLE_CASTLE_PIECES(7, 7, 7, 2),
-    guideSteps: [
-      { move: '▲6八玉', hint: '玉を6八に移動します。舟囲いは素早く組めるのが特長。', highlight: { col: 6, row: 8 } },
-      { move: '▲7八玉', hint: '玉を7八に引き付けます。', highlight: { col: 7, row: 8 } },
-      { move: '▲5八金右', hint: '右の金を5八に上げます。玉の横を守ります。', highlight: { col: 5, row: 8 } },
-      { move: '▲4八銀', hint: '銀を4八に上げます。', highlight: { col: 4, row: 8 } },
-      { move: '▲3八銀', hint: '銀を3八に引き付けて完成。素早く組めるのが舟囲いの魅力です！', highlight: { col: 3, row: 8 } },
-    ],
+    guidePieces: FUNE_GUIDE_PIECES,
+    guideSteps: buildGuideSteps(FUNE_GUIDE_PIECES, FUNE_MOVE_SPECS),
     guideHighlight: { col: 6, row: 8 },
     guideNextMove: '▲6八金',
     guideStep: [3, 7],
@@ -421,17 +590,8 @@ export const CASTLES: Castle[] = [
     recommendedAgainst: '振り飛車党（対振り飛車で多用）',
     basicSteps: ['▲7六歩', '▲6八玉', '▲7八玉', '▲8八玉', '▲9八玉', '▲8八銀'],
     pieces: SIMPLE_CASTLE_PIECES(9, 8, 8, 2),
-    guidePieces: SIMPLE_CASTLE_PIECES(9, 9, 8, 2),
-    guideSteps: [
-      { move: '▲6八玉', hint: '玉を6八に移動します。端への長い旅が始まります。', highlight: { col: 6, row: 8 } },
-      { move: '▲7八玉', hint: '玉を7八に移動。端に向かって一歩一歩。', highlight: { col: 7, row: 8 } },
-      { move: '▲8八玉', hint: '玉を8八に移動。穴熊への道。', highlight: { col: 8, row: 8 } },
-      { move: '▲9八玉', hint: '玉を9八まで寄せます。端への一手。', highlight: { col: 9, row: 8 } },
-      { move: '▲9九玉', hint: '玉を9九の隅に収めます。これが穴熊の「穴」です。', highlight: { col: 9, row: 9 } },
-      { move: '▲8八銀', hint: '銀を8八に上げて玉の斜め上を守ります。', highlight: { col: 8, row: 8 } },
-      { move: '▲7九金', hint: '金を7九に引き付けます。', highlight: { col: 7, row: 9 } },
-      { move: '▲8九金', hint: '金を8九に配置。玉を三方から守る居飛車穴熊の完成です！', highlight: { col: 8, row: 9 } },
-    ],
+    guidePieces: IBISHA_ANAGUMA_GUIDE_PIECES,
+    guideSteps: buildGuideSteps(IBISHA_ANAGUMA_GUIDE_PIECES, IBISHA_ANAGUMA_MOVE_SPECS),
     guideHighlight: { col: 9, row: 8 },
     guideNextMove: '▲9八玉',
     guideStep: [8, 14],
@@ -458,17 +618,8 @@ export const CASTLES: Castle[] = [
     recommendedAgainst: '居飛車党（相穴熊も含む）',
     basicSteps: ['▲7六歩', '▲7八飛', '▲6八銀', '▲5八金', '▲4八玉', '▲3八玉'],
     pieces: SIMPLE_CASTLE_PIECES(1, 2, 2, 7),
-    guidePieces: SIMPLE_CASTLE_PIECES(1, 1, 2, 7),
-    guideSteps: [
-      { move: '▲7八飛', hint: '飛車を7筋に振ります。振り飛車の出発点です。', highlight: { col: 7, row: 8 } },
-      { move: '▲4八玉', hint: '玉を4八に移動。端への長い旅の始まりです。', highlight: { col: 4, row: 8 } },
-      { move: '▲3八玉', hint: '玉を3八にさらに移動。', highlight: { col: 3, row: 8 } },
-      { move: '▲2八玉', hint: '玉を2八に移動。', highlight: { col: 2, row: 8 } },
-      { move: '▲1八玉', hint: '玉を1八の端に収めます。', highlight: { col: 1, row: 8 } },
-      { move: '▲1九玉', hint: '玉を1九の隅に。振り飛車穴熊の「穴」です。', highlight: { col: 1, row: 9 } },
-      { move: '▲2八銀', hint: '銀を2八に上げて玉を守ります。', highlight: { col: 2, row: 8 } },
-      { move: '▲2九金', hint: '金を2九に配置。玉を三方から守る振り飛車穴熊の完成です！', highlight: { col: 2, row: 9 } },
-    ],
+    guidePieces: FURIBISHA_ANAGUMA_GUIDE_PIECES,
+    guideSteps: buildGuideSteps(FURIBISHA_ANAGUMA_GUIDE_PIECES, FURIBISHA_ANAGUMA_MOVE_SPECS),
     guideHighlight: { col: 1, row: 8 },
     guideNextMove: '▲1八玉',
     guideStep: [6, 12],
