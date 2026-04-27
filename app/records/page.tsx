@@ -1,7 +1,34 @@
+'use client'
+
+import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import BottomNav from '../components/BottomNav'
+import { getLearningRecords } from '../lib/learningRecords'
+import type { LearningRecord } from '../lib/learningRecords'
+import { CASTLES } from '../lib/castles'
+
+const TOTAL_CASTLES = CASTLES.length
+
+function formatDate(iso: string): string {
+  return new Date(iso).toLocaleDateString('ja-JP', {
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric',
+  })
+}
 
 export default function RecordsPage() {
+  const [records, setRecords] = useState<LearningRecord[]>([])
+  const [mounted, setMounted] = useState(false)
+
+  useEffect(() => {
+    setMounted(true)
+    setRecords(getLearningRecords())
+  }, [])
+
+  const learned = records.length
+  const percent = TOTAL_CASTLES > 0 ? Math.round((learned / TOTAL_CASTLES) * 100) : 0
+
   return (
     <div className="min-h-screen bg-[#F5F0E8] pb-safe">
       <header className="flex items-center gap-3 px-4 pt-10 pb-3 bg-white border-b border-gray-100">
@@ -13,45 +40,91 @@ export default function RecordsPage() {
         <h1 className="text-lg font-bold text-gray-900">学習記録</h1>
       </header>
 
-      <div className="px-4 py-8 flex flex-col items-center gap-4">
-        <div className="w-16 h-16 bg-[#7B5E2A] rounded-full flex items-center justify-center">
-          <svg viewBox="0 0 24 24" fill="white" className="w-8 h-8">
-            <path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-7 3c1.93 0 3.5 1.57 3.5 3.5S13.93 13 12 13s-3.5-1.57-3.5-3.5S10.07 6 12 6zm7 13H5v-.23c0-.62.28-1.2.76-1.58C7.47 15.82 9.64 15 12 15s4.53.82 6.24 2.19c.48.38.76.97.76 1.58V19z" />
-          </svg>
+      <div className="px-4 py-4 space-y-4">
+        {/* Stats card */}
+        <div className="bg-white rounded-2xl p-4 shadow-sm border border-gray-100">
+          <div className="flex items-center justify-between mb-3">
+            <span className="text-sm font-semibold text-gray-700">習得済み囲い</span>
+            <span className="text-sm font-bold text-[#7B5E2A]">
+              {mounted ? learned : '-'} / {TOTAL_CASTLES}
+            </span>
+          </div>
+          <div className="h-2.5 bg-gray-100 rounded-full overflow-hidden">
+            <div
+              className="h-full bg-[#2E7D32] rounded-full transition-all duration-500"
+              style={{ width: mounted ? `${percent}%` : '0%' }}
+            />
+          </div>
+          <p className="text-xs text-gray-400 mt-1.5 text-right">{mounted ? percent : 0}% 完了</p>
         </div>
 
-        <div className="text-center">
-          <h2 className="text-xl font-bold text-gray-900 mb-1">学習記録</h2>
-          <span className="bg-[#7B5E2A] text-white text-xs px-3 py-1 rounded-full font-medium">
-            Coming Soon
-          </span>
-        </div>
+        {/* Records list */}
+        {mounted && records.length === 0 ? (
+          <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 text-center">
+            <p className="text-sm text-gray-500 mb-4">まだ学習記録がありません。</p>
+            <Link
+              href="/castles"
+              className="inline-block bg-[#1a2744] text-white font-bold py-2.5 px-6 rounded-xl shadow text-sm"
+            >
+              囲いの練習を始める
+            </Link>
+          </div>
+        ) : (
+          <section>
+            <h2 className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-2">習得済み</h2>
+            <ul className="space-y-2">
+              {records.map((r) => (
+                <li key={r.id}>
+                  <Link href={`/castles/${r.id}`}>
+                    <div className="bg-white rounded-xl border border-gray-100 shadow-sm px-4 py-3 flex items-center gap-3 hover:border-[#7B5E2A]/30 transition-colors active:scale-[0.99]">
+                      <span className="text-[#2E7D32] text-lg flex-shrink-0">✓</span>
+                      <div className="flex-1 min-w-0">
+                        <p className="text-sm font-semibold text-gray-900">{r.name}</p>
+                        <p className="text-xs text-gray-400 mt-0.5">{formatDate(r.learnedAt)}</p>
+                      </div>
+                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} className="w-4 h-4 text-gray-300 flex-shrink-0">
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
+                      </svg>
+                    </div>
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </section>
+        )}
 
-        <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 w-full max-w-sm">
-          <p className="text-sm text-gray-600 text-center leading-relaxed">
-            今後、以下の機能を追加予定です
-          </p>
-          <ul className="mt-4 space-y-2">
-            {[
-              '練習回数の記録',
-              '囲いごとの正答率',
-              '完成度の推移グラフ',
-              '連続学習ストリーク',
-            ].map(item => (
-              <li key={item} className="flex items-center gap-2 text-sm text-gray-500">
-                <span className="w-1.5 h-1.5 rounded-full bg-[#7B5E2A] flex-shrink-0" />
-                {item}
-              </li>
-            ))}
-          </ul>
-        </div>
-
-        <Link
-          href="/castles"
-          className="bg-[#1a2744] text-white font-bold py-3 px-8 rounded-xl shadow text-sm"
-        >
-          囲いの練習を始める
-        </Link>
+        {/* Unlearned castles */}
+        {mounted && records.length > 0 && (
+          <section>
+            {(() => {
+              const learnedIds = new Set(records.map((r) => r.id))
+              const unlearned = CASTLES.filter((c) => !learnedIds.has(c.id))
+              if (unlearned.length === 0) return null
+              return (
+                <>
+                  <h2 className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-2">未習得 ({unlearned.length})</h2>
+                  <ul className="space-y-2">
+                    {unlearned.map((c) => (
+                      <li key={c.id}>
+                        <Link href={`/castles/${c.id}`}>
+                          <div className="bg-white rounded-xl border border-gray-100 shadow-sm px-4 py-3 flex items-center gap-3 hover:border-gray-300 transition-colors active:scale-[0.99] opacity-70">
+                            <span className="text-gray-300 text-lg flex-shrink-0">○</span>
+                            <div className="flex-1 min-w-0">
+                              <p className="text-sm font-semibold text-gray-700">{c.name}</p>
+                            </div>
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} className="w-4 h-4 text-gray-300 flex-shrink-0">
+                              <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
+                            </svg>
+                          </div>
+                        </Link>
+                      </li>
+                    ))}
+                  </ul>
+                </>
+              )
+            })()}
+          </section>
+        )}
       </div>
 
       <BottomNav />

@@ -1,10 +1,11 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import ShogiBoard from '../../components/ShogiBoard'
 import BottomNav from '../../components/BottomNav'
 import type { Castle } from '../../lib/types'
+import { recordLearned } from '../../lib/learningRecords'
 
 type Props = {
   castle: Castle
@@ -18,6 +19,12 @@ export default function GuideClient({ castle }: Props) {
   const totalSteps = steps.length
   const isFirstStep = currentStep === 0
   const isLastStep = currentStep === totalSteps - 1
+
+  useEffect(() => {
+    if (isLastStep) {
+      recordLearned(castle.id, castle.name)
+    }
+  }, [isLastStep, castle.id, castle.name])
   const currentStepData = steps[currentStep]
   const progressPercent = totalSteps > 1
     ? Math.round((currentStep / (totalSteps - 1)) * 100)
