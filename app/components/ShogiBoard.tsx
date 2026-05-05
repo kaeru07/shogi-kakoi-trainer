@@ -7,6 +7,7 @@ type Props = {
   highlight?: BoardHighlight
   highlightFrom?: BoardHighlight
   selectedCell?: BoardHighlight
+  validMoves?: BoardHighlight[]
   onCellClick?: (col: number, row: number) => void
   small?: boolean
 }
@@ -25,7 +26,7 @@ function piecesToBoard(pieces: PiecePosition[]): (PiecePosition | null)[][] {
   return board
 }
 
-export default function ShogiBoard({ pieces, highlight, highlightFrom, selectedCell, onCellClick, small = false }: Props) {
+export default function ShogiBoard({ pieces, highlight, highlightFrom, selectedCell, validMoves, onCellClick, small = false }: Props) {
   const board = piecesToBoard(pieces)
   const labelSize = small ? 'text-[6px]' : 'text-[9px]'
   const labelW = small ? 'w-3' : 'w-4'
@@ -58,6 +59,9 @@ export default function ShogiBoard({ pieces, highlight, highlightFrom, selectedC
               const isSelected = selectedCell
                 ? selectedCell.row - 1 === ri && 9 - selectedCell.col === ci
                 : false
+              const isValidMove = validMoves
+                ? validMoves.some(m => m.row - 1 === ri && 9 - m.col === ci)
+                : false
               const col = 9 - ci
               const row2 = ri + 1
               return (
@@ -67,7 +71,11 @@ export default function ShogiBoard({ pieces, highlight, highlightFrom, selectedC
                   className={[
                     'flex-1 aspect-square border border-[#A0845C] flex items-center justify-center',
                     onCellClick ? 'cursor-pointer' : '',
-                    isSelected ? 'bg-blue-300' : isHighlight ? 'bg-emerald-300' : isHighlightFrom ? 'bg-yellow-200' : 'bg-[#DEB887]',
+                    isSelected ? 'bg-blue-300'
+                      : isValidMove ? 'bg-blue-100'
+                      : isHighlight ? 'bg-emerald-300'
+                      : isHighlightFrom ? 'bg-yellow-200'
+                      : 'bg-[#DEB887]',
                   ].join(' ')}
                 >
                   {cell && (

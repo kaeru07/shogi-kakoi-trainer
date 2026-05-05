@@ -1,12 +1,13 @@
 'use client'
 
 import { use } from 'react'
-import { useState, useCallback } from 'react'
+import { useState, useCallback, useMemo } from 'react'
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
 import ShogiBoard from '../../components/ShogiBoard'
 import BottomNav from '../../components/BottomNav'
 import { getCastle } from '../../lib/castles'
+import { getValidMoves } from '../../lib/shogiMoves'
 import type { PiecePosition, BoardHighlight } from '../../lib/types'
 
 function calcScore(current: PiecePosition[], target: PiecePosition[]): number {
@@ -33,12 +34,20 @@ export default function TestPage({
 
   const dynamicScore = scored ? calcScore(pieces, castle.pieces) : 0
 
+  // Calculate valid moves for the selected piece
+  const validMoves = useMemo<BoardHighlight[]>(() => {
+    if (!selectedCell) return []
+    const piece = pieces.find(p => p.col === selectedCell.col && p.row === selectedCell.row)
+    if (!piece) return []
+    return getValidMoves(piece, pieces)
+  }, [selectedCell, pieces])
+
   const handleCellClick = useCallback((col: number, row: number) => {
     if (scored) return
 
     if (!selectedCell) {
-      const hasPiece = pieces.some(p => p.col === col && p.row === row)
-      if (hasPiece) setSelectedCell({ col, row })
+      const piece = pieces.find(p => p.col === col && p.row === row)
+      if (piece) setSelectedCell({ col, row })
       return
     }
 
@@ -48,18 +57,30 @@ export default function TestPage({
       return
     }
 
+    // Click another piece of same side → switch selection
+    const clickedPiece = pieces.find(p => p.col === col && p.row === row)
+    const movingPiece = pieces.find(p => p.col === selectedCell.col && p.row === selectedCell.row)
+    if (clickedPiece && movingPiece && clickedPiece.isGote === movingPiece.isGote) {
+      setSelectedCell({ col, row })
+      return
+    }
+
+    // Check if the target is a valid move
+    const isValid = validMoves.some(m => m.col === col && m.row === row)
+    if (!isValid) {
+      setSelectedCell(null)
+      return
+    }
+
     // Move piece
-    setPieces(prev => {
-      const moving = prev.find(p => p.col === selectedCell.col && p.row === selectedCell.row)
-      if (!moving) return prev
-      // Remove piece at destination (capture) and move the selected piece
-      return prev
+    setPieces(prev =>
+      prev
         .filter(p => !(p.col === selectedCell.col && p.row === selectedCell.row))
         .filter(p => !(p.col === col && p.row === row))
-        .concat({ ...moving, col, row })
-    })
+        .concat({ ...movingPiece!, col, row })
+    )
     setSelectedCell(null)
-  }, [selectedCell, pieces, scored])
+  }, [selectedCell, pieces, validMoves, scored])
 
   const handleReset = () => {
     setPieces([...castle.testPieces])
@@ -89,7 +110,9 @@ export default function TestPage({
             この局面から{castle.name}を完成させてください
           </p>
           {selectedCell && (
-            <p className="text-xs text-blue-600 mt-1">駒を選択中 — 移動先をタップしてください</p>
+            <p className="text-xs text-blue-600 mt-1">
+              {validMoves.length > 0 ? `${validMoves.length}マスへ移動できます` : '移動できるマスがありません'}
+            </p>
           )}
         </div>
 
@@ -98,6 +121,7 @@ export default function TestPage({
           <ShogiBoard
             pieces={pieces}
             selectedCell={selectedCell ?? undefined}
+            validMoves={validMoves}
             onCellClick={!scored ? handleCellClick : undefined}
           />
         </div>
@@ -121,7 +145,6 @@ export default function TestPage({
               </p>
             </div>
 
-            {/* Good points */}
             <div className="bg-white rounded-xl p-4 shadow-sm">
               <div className="flex items-center gap-2 mb-2">
                 <span className="text-green-600 font-bold">✓</span>
@@ -134,7 +157,6 @@ export default function TestPage({
               </ul>
             </div>
 
-            {/* Fix points */}
             {dynamicScore < 100 && (
               <div className="bg-white rounded-xl p-4 shadow-sm">
                 <div className="flex items-center gap-2 mb-2">
