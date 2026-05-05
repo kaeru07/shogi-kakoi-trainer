@@ -1,12 +1,21 @@
 'use client'
 
 import { use } from 'react'
-import { useState } from 'react'
+import { useState, useCallback } from 'react'
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
 import ShogiBoard from '../../components/ShogiBoard'
 import BottomNav from '../../components/BottomNav'
 import { getCastle } from '../../lib/castles'
+import type { PiecePosition, BoardHighlight } from '../../lib/types'
+
+function calcScore(current: PiecePosition[], target: PiecePosition[]): number {
+  if (target.length === 0) return 0
+  const matched = target.filter(t =>
+    current.some(p => p.col === t.col && p.row === t.row && p.kanji === t.kanji && p.isGote === t.isGote)
+  ).length
+  return Math.round((matched / target.length) * 100)
+}
 
 export default function TestPage({
   params,
@@ -17,8 +26,47 @@ export default function TestPage({
   const castle = getCastle(id)
   if (!castle) notFound()
 
+  const [pieces, setPieces] = useState<PiecePosition[]>([...castle.testPieces])
+  const [selectedCell, setSelectedCell] = useState<BoardHighlight | null>(null)
   const [scored, setScored] = useState(false)
   const [showHint, setShowHint] = useState(false)
+
+  const dynamicScore = scored ? calcScore(pieces, castle.pieces) : 0
+
+  const handleCellClick = useCallback((col: number, row: number) => {
+    if (scored) return
+
+    if (!selectedCell) {
+      const hasPiece = pieces.some(p => p.col === col && p.row === row)
+      if (hasPiece) setSelectedCell({ col, row })
+      return
+    }
+
+    // Deselect on same cell
+    if (selectedCell.col === col && selectedCell.row === row) {
+      setSelectedCell(null)
+      return
+    }
+
+    // Move piece
+    setPieces(prev => {
+      const moving = prev.find(p => p.col === selectedCell.col && p.row === selectedCell.row)
+      if (!moving) return prev
+      // Remove piece at destination (capture) and move the selected piece
+      return prev
+        .filter(p => !(p.col === selectedCell.col && p.row === selectedCell.row))
+        .filter(p => !(p.col === col && p.row === row))
+        .concat({ ...moving, col, row })
+    })
+    setSelectedCell(null)
+  }, [selectedCell, pieces, scored])
+
+  const handleReset = () => {
+    setPieces([...castle.testPieces])
+    setSelectedCell(null)
+    setScored(false)
+    setShowHint(false)
+  }
 
   return (
     <div className="min-h-screen bg-[#F5F0E8] pb-safe">
@@ -32,9 +80,6 @@ export default function TestPage({
           </Link>
           <h1 className="text-lg font-bold text-gray-900">テストモード</h1>
         </div>
-        <button className="w-8 h-8 rounded-full bg-gray-200 flex items-center justify-center text-gray-600 text-sm font-bold">
-          ?
-        </button>
       </header>
 
       <div className="px-4 py-4 space-y-3">
@@ -43,11 +88,18 @@ export default function TestPage({
           <p className="text-sm font-bold text-gray-800">
             この局面から{castle.name}を完成させてください
           </p>
+          {selectedCell && (
+            <p className="text-xs text-blue-600 mt-1">駒を選択中 — 移動先をタップしてください</p>
+          )}
         </div>
 
         {/* Board */}
         <div className="bg-[#E8DFC8] rounded-2xl p-4">
-          <ShogiBoard pieces={castle.testPieces} />
+          <ShogiBoard
+            pieces={pieces}
+            selectedCell={selectedCell ?? undefined}
+            onCellClick={!scored ? handleCellClick : undefined}
+          />
         </div>
 
         {/* Score */}
@@ -56,15 +108,17 @@ export default function TestPage({
             <div className="bg-white rounded-xl p-4 shadow-sm">
               <div className="flex items-center justify-between mb-1">
                 <span className="font-bold text-sm text-gray-800">完成度</span>
-                <span className="text-3xl font-bold text-[#2E7D32]">{castle.testScore}%</span>
+                <span className="text-3xl font-bold text-[#2E7D32]">{dynamicScore}%</span>
               </div>
               <div className="h-3 bg-gray-200 rounded-full overflow-hidden mb-2">
                 <div
                   className="h-full bg-[#2E7D32] rounded-full"
-                  style={{ width: `${castle.testScore}%` }}
+                  style={{ width: `${dynamicScore}%` }}
                 />
               </div>
-              <p className="text-sm font-bold text-[#2E7D32] text-center">{castle.testMessage}</p>
+              <p className="text-sm font-bold text-[#2E7D32] text-center">
+                {dynamicScore === 100 ? '完璧！囲い完成です！' : castle.testMessage}
+              </p>
             </div>
 
             {/* Good points */}
@@ -81,17 +135,26 @@ export default function TestPage({
             </div>
 
             {/* Fix points */}
-            <div className="bg-white rounded-xl p-4 shadow-sm">
-              <div className="flex items-center gap-2 mb-2">
-                <span className="text-red-500 font-bold">✕</span>
-                <span className="font-bold text-sm text-gray-800">修正点</span>
+            {dynamicScore < 100 && (
+              <div className="bg-white rounded-xl p-4 shadow-sm">
+                <div className="flex items-center gap-2 mb-2">
+                  <span className="text-red-500 font-bold">✕</span>
+                  <span className="font-bold text-sm text-gray-800">修正点</span>
+                </div>
+                <ul className="space-y-1">
+                  {castle.testFixPoints.map((p, i) => (
+                    <li key={i} className="text-sm text-gray-700">・{p}</li>
+                  ))}
+                </ul>
               </div>
-              <ul className="space-y-1">
-                {castle.testFixPoints.map((p, i) => (
-                  <li key={i} className="text-sm text-gray-700">・{p}</li>
-                ))}
-              </ul>
-            </div>
+            )}
+
+            <button
+              onClick={handleReset}
+              className="w-full py-3 rounded-xl border-2 border-gray-300 text-gray-700 font-bold bg-white text-sm"
+            >
+              もう一度挑戦する
+            </button>
           </>
         )}
 
@@ -109,30 +172,35 @@ export default function TestPage({
         )}
 
         {/* Action buttons */}
-        <div className="grid grid-cols-3 gap-2 pb-4">
-          <button className="flex flex-col items-center justify-center gap-1 border-2 border-gray-300 text-gray-700 font-bold py-3 rounded-xl bg-white text-xs">
-            <svg viewBox="0 0 24 24" fill="currentColor" className="w-4 h-4">
-              <path d="M17.65 6.35C16.2 4.9 14.21 4 12 4c-4.42 0-7.99 3.58-7.99 8s3.57 8 7.99 8c3.73 0 6.84-2.55 7.73-6h-2.08c-.82 2.33-3.04 4-5.65 4-3.31 0-6-2.69-6-6s2.69-6 6-6c1.66 0 3.14.69 4.22 1.78L13 11h7V4l-2.35 2.35z" />
-            </svg>
-            やり直し
-          </button>
-          <button
-            onClick={() => setShowHint(true)}
-            className="flex flex-col items-center justify-center gap-1 border-2 border-[#7B5E2A] text-[#7B5E2A] font-bold py-3 rounded-xl bg-white text-xs"
-          >
-            <span>💡</span>
-            ヒントを見る
-          </button>
-          <button
-            onClick={() => setScored(true)}
-            className="flex flex-col items-center justify-center gap-1 bg-[#2E7D32] text-white font-bold py-3 rounded-xl shadow text-xs"
-          >
-            <svg viewBox="0 0 24 24" fill="currentColor" className="w-4 h-4">
-              <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z" />
-            </svg>
-            採点する
-          </button>
-        </div>
+        {!scored && (
+          <div className="grid grid-cols-3 gap-2 pb-4">
+            <button
+              onClick={handleReset}
+              className="flex flex-col items-center justify-center gap-1 border-2 border-gray-300 text-gray-700 font-bold py-3 rounded-xl bg-white text-xs"
+            >
+              <svg viewBox="0 0 24 24" fill="currentColor" className="w-4 h-4">
+                <path d="M17.65 6.35C16.2 4.9 14.21 4 12 4c-4.42 0-7.99 3.58-7.99 8s3.57 8 7.99 8c3.73 0 6.84-2.55 7.73-6h-2.08c-.82 2.33-3.04 4-5.65 4-3.31 0-6-2.69-6-6s2.69-6 6-6c1.66 0 3.14.69 4.22 1.78L13 11h7V4l-2.35 2.35z" />
+              </svg>
+              やり直し
+            </button>
+            <button
+              onClick={() => setShowHint(true)}
+              className="flex flex-col items-center justify-center gap-1 border-2 border-[#7B5E2A] text-[#7B5E2A] font-bold py-3 rounded-xl bg-white text-xs"
+            >
+              <span>💡</span>
+              ヒントを見る
+            </button>
+            <button
+              onClick={() => setScored(true)}
+              className="flex flex-col items-center justify-center gap-1 bg-[#2E7D32] text-white font-bold py-3 rounded-xl shadow text-xs"
+            >
+              <svg viewBox="0 0 24 24" fill="currentColor" className="w-4 h-4">
+                <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z" />
+              </svg>
+              採点する
+            </button>
+          </div>
+        )}
       </div>
 
       <BottomNav />
