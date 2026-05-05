@@ -17,6 +17,34 @@ const GOTE_STANDARD: PiecePosition[] = [
   })),
 ]
 
+const SENTE_STANDARD: PiecePosition[] = [
+  { kanji: '歩', col: 9, row: 7, isGote: false },
+  { kanji: '歩', col: 8, row: 7, isGote: false },
+  { kanji: '歩', col: 7, row: 7, isGote: false },
+  { kanji: '歩', col: 6, row: 7, isGote: false },
+  { kanji: '歩', col: 5, row: 7, isGote: false },
+  { kanji: '歩', col: 4, row: 7, isGote: false },
+  { kanji: '歩', col: 3, row: 7, isGote: false },
+  { kanji: '歩', col: 2, row: 7, isGote: false },
+  { kanji: '歩', col: 1, row: 7, isGote: false },
+  { kanji: '角', col: 8, row: 8, isGote: false },
+  { kanji: '飛', col: 2, row: 8, isGote: false },
+  { kanji: '香', col: 9, row: 9, isGote: false },
+  { kanji: '桂', col: 8, row: 9, isGote: false },
+  { kanji: '銀', col: 7, row: 9, isGote: false },
+  { kanji: '金', col: 6, row: 9, isGote: false },
+  { kanji: '玉', col: 5, row: 9, isGote: false },
+  { kanji: '金', col: 4, row: 9, isGote: false },
+  { kanji: '銀', col: 3, row: 9, isGote: false },
+  { kanji: '桂', col: 2, row: 9, isGote: false },
+  { kanji: '香', col: 1, row: 9, isGote: false },
+]
+
+const INITIAL_PIECES: PiecePosition[] = [
+  ...GOTE_STANDARD,
+  ...SENTE_STANDARD,
+]
+
 const MINO_PIECES: PiecePosition[] = [
   ...GOTE_STANDARD,
   { kanji: '歩', col: 9, row: 7, isGote: false },
@@ -33,55 +61,6 @@ const MINO_PIECES: PiecePosition[] = [
   { kanji: '桂', col: 8, row: 9, isGote: false },
   { kanji: '金', col: 6, row: 9, isGote: false },
   { kanji: '金', col: 4, row: 9, isGote: false },
-  { kanji: '桂', col: 2, row: 9, isGote: false },
-  { kanji: '香', col: 1, row: 9, isGote: false },
-]
-
-const MINO_GUIDE_PIECES: PiecePosition[] = [
-  ...GOTE_STANDARD,
-  { kanji: '歩', col: 9, row: 7, isGote: false },
-  { kanji: '歩', col: 5, row: 7, isGote: false },
-  { kanji: '歩', col: 4, row: 7, isGote: false },
-  { kanji: '角', col: 3, row: 7, isGote: false },
-  { kanji: '歩', col: 2, row: 7, isGote: false },
-  { kanji: '歩', col: 1, row: 7, isGote: false },
-  { kanji: '飛', col: 9, row: 8, isGote: false },
-  { kanji: '玉', col: 8, row: 8, isGote: false },
-  { kanji: '金', col: 6, row: 8, isGote: false },
-  { kanji: '香', col: 9, row: 9, isGote: false },
-  { kanji: '桂', col: 8, row: 9, isGote: false },
-  { kanji: '銀', col: 7, row: 9, isGote: false },
-  { kanji: '金', col: 4, row: 9, isGote: false },
-  { kanji: '桂', col: 2, row: 9, isGote: false },
-  { kanji: '香', col: 1, row: 9, isGote: false },
-]
-
-const MINO_TEST_PIECES: PiecePosition[] = [
-  { kanji: '玉', col: 5, row: 1, isGote: true },
-  { kanji: '金', col: 4, row: 1, isGote: true },
-  { kanji: '金', col: 6, row: 1, isGote: true },
-  { kanji: '銀', col: 3, row: 2, isGote: true },
-  { kanji: '飛', col: 3, row: 3, isGote: true },
-  { kanji: '角', col: 7, row: 4, isGote: true },
-  { kanji: '歩', col: 9, row: 3, isGote: true },
-  { kanji: '歩', col: 8, row: 3, isGote: true },
-  { kanji: '歩', col: 5, row: 3, isGote: true },
-  { kanji: '歩', col: 4, row: 4, isGote: true },
-  { kanji: '歩', col: 2, row: 3, isGote: true },
-  { kanji: '歩', col: 1, row: 3, isGote: true },
-  { kanji: '歩', col: 9, row: 7, isGote: false },
-  { kanji: '歩', col: 8, row: 6, isGote: false },
-  { kanji: '銀', col: 6, row: 7, isGote: false },
-  { kanji: '歩', col: 4, row: 7, isGote: false },
-  { kanji: '歩', col: 2, row: 7, isGote: false },
-  { kanji: '歩', col: 1, row: 7, isGote: false },
-  { kanji: '飛', col: 4, row: 8, isGote: false },
-  { kanji: '玉', col: 8, row: 8, isGote: false },
-  { kanji: '金', col: 7, row: 8, isGote: false },
-  { kanji: '金', col: 5, row: 8, isGote: false },
-  { kanji: '香', col: 9, row: 9, isGote: false },
-  { kanji: '桂', col: 8, row: 9, isGote: false },
-  { kanji: '金', col: 6, row: 9, isGote: false },
   { kanji: '桂', col: 2, row: 9, isGote: false },
   { kanji: '香', col: 1, row: 9, isGote: false },
 ]
@@ -169,12 +148,18 @@ function buildGuideSteps(initial: PiecePosition[], specs: MoveSpec[]): GuideStep
   return result
 }
 
-// 美濃囲い: 5手の移動 + 完成確認 = 6ステップ
+// 美濃囲い: 初期配置から動かす手順 + 完成確認
 // boardPosition[i] = ステップiを「次にやること」として見せる盤面（手前の状態）
 const MINO_MOVE_SPECS: MoveSpec[] = [
   {
+    move: '▲7六歩',
+    hint: '7筋の歩を突き、銀が上がる道を作ります。🟡の駒を🟢のマスへ動かしてください。',
+    from: { col: 7, row: 7 },
+    to: { col: 7, row: 6 },
+  },
+  {
     move: '▲7八銀',
-    hint: '銀を7八に上げます。玉の横を守る最初の一手です。🟡の駒を🟢のマスへ動かしてください。',
+    hint: '銀を7八に上げます。玉の横を守る最初の一手です。',
     from: { col: 7, row: 9 },
     to: { col: 7, row: 8 },
   },
@@ -210,32 +195,36 @@ const MINO_MOVE_SPECS: MoveSpec[] = [
   },
 ]
 
-// Guide piece starting positions
-const TAKAMINO_GUIDE_PIECES = SIMPLE_CASTLE_PIECES(8, 6, 7, 9)
-const GINKAN_GUIDE_PIECES = SIMPLE_CASTLE_PIECES(7, 7, 6, 9)
-const YAGURA_GUIDE_PIECES = SIMPLE_CASTLE_PIECES(6, 7, 7, 2)
-const FUNE_GUIDE_PIECES = SIMPLE_CASTLE_PIECES(7, 7, 7, 2)
-const IBISHA_ANAGUMA_GUIDE_PIECES = SIMPLE_CASTLE_PIECES(9, 9, 8, 2)
-const FURIBISHA_ANAGUMA_GUIDE_PIECES = SIMPLE_CASTLE_PIECES(1, 1, 2, 7)
-
 // 高美濃: 4手 + 完成
 const TAKAMINO_MOVE_SPECS: MoveSpec[] = [
   {
-    move: '▲8七銀',
-    hint: '銀を8七に上げます。高美濃特有の銀の位置です。🟡の駒を🟢のマスへ動かしてください。',
+    move: '▲7六歩',
+    hint: '7筋の歩を突いて銀の進路を開けます。🟡の駒を🟢のマスへ動かしてください。',
     from: { col: 7, row: 7 },
+    to: { col: 7, row: 6 },
+  },
+  {
+    move: '▲7八銀',
+    hint: '銀を7八に上げます。高美濃へ組む準備です。',
+    from: { col: 7, row: 9 },
+    to: { col: 7, row: 8 },
+  },
+  {
+    move: '▲8七銀',
+    hint: '銀を8七に上げます。高美濃特有の銀の位置です。',
+    from: { col: 7, row: 8 },
     to: { col: 8, row: 7 },
   },
   {
     move: '▲7八金右',
     hint: '右の金を7八に上げます。玉の横に金を配置して守りを厚くします。',
-    from: { col: 6, row: 8 },
+    from: { col: 6, row: 9 },
     to: { col: 7, row: 8 },
   },
   {
     move: '▲7九金左',
     hint: '左の金を7九に引き付けます。金二枚で玉の下を固めます。',
-    from: { col: 6, row: 9 },
+    from: { col: 4, row: 9 },
     to: { col: 7, row: 9 },
   },
   {
@@ -255,9 +244,21 @@ const TAKAMINO_MOVE_SPECS: MoveSpec[] = [
 // 銀冠: 3手 + 完成
 const GINKAN_MOVE_SPECS: MoveSpec[] = [
   {
+    move: '▲7六歩',
+    hint: '7筋の歩を突いて銀の進路を作ります。🟡の駒を🟢のマスへ動かしてください。',
+    from: { col: 7, row: 7 },
+    to: { col: 7, row: 6 },
+  },
+  {
+    move: '▲7八銀',
+    hint: '銀を7八に上げ、銀冠へ組む準備をします。',
+    from: { col: 7, row: 9 },
+    to: { col: 7, row: 8 },
+  },
+  {
     move: '▲7七銀',
-    hint: '銀を7七に上げます。玉の頭を守る銀冠の核心です。🟡の駒を🟢のマスへ動かしてください。',
-    from: { col: 6, row: 7 },
+    hint: '銀を7七に上げます。玉の頭を守る銀冠の核心です。',
+    from: { col: 7, row: 8 },
     to: { col: 7, row: 7 },
   },
   {
@@ -283,9 +284,21 @@ const GINKAN_MOVE_SPECS: MoveSpec[] = [
 // 矢倉: 3手 + 完成
 const YAGURA_MOVE_SPECS: MoveSpec[] = [
   {
-    move: '▲6七銀',
-    hint: '銀を6七に引き付けます。飛車先を守りながら矢倉の陣形を整えます。🟡の駒を🟢のマスへ動かしてください。',
+    move: '▲7六歩',
+    hint: '7筋の歩を突いて銀が上がる道を作ります。🟡の駒を🟢のマスへ動かしてください。',
     from: { col: 7, row: 7 },
+    to: { col: 7, row: 6 },
+  },
+  {
+    move: '▲6六歩',
+    hint: '6筋の歩を突き、銀を6七へ進めるマスを空けます。',
+    from: { col: 6, row: 7 },
+    to: { col: 6, row: 6 },
+  },
+  {
+    move: '▲6七銀',
+    hint: '銀を6七に引き付けます。飛車先を守りながら矢倉の陣形を整えます。',
+    from: { col: 7, row: 9 },
     to: { col: 6, row: 7 },
   },
   {
@@ -311,9 +324,21 @@ const YAGURA_MOVE_SPECS: MoveSpec[] = [
 // 舟囲い: 4手 + 完成
 const FUNE_MOVE_SPECS: MoveSpec[] = [
   {
+    move: '▲6六歩',
+    hint: '6筋の歩を突き、銀を上がれるようにします。🟡の駒を🟢のマスへ動かしてください。',
+    from: { col: 6, row: 7 },
+    to: { col: 6, row: 6 },
+  },
+  {
+    move: '▲6八玉',
+    hint: '玉を6八へ寄せ、金を動かす場所を空けます。',
+    from: { col: 5, row: 9 },
+    to: { col: 6, row: 8 },
+  },
+  {
     move: '▲6七銀',
-    hint: '銀を6七に上げます。舟囲いは素早く組める機動性が特長。🟡の駒を🟢のマスへ動かしてください。',
-    from: { col: 7, row: 7 },
+    hint: '銀を6七に上げます。舟囲いは素早く組める機動性が特長。',
+    from: { col: 7, row: 9 },
     to: { col: 6, row: 7 },
   },
   {
@@ -345,9 +370,27 @@ const FUNE_MOVE_SPECS: MoveSpec[] = [
 // 居飛車穴熊: 4手 + 完成
 const IBISHA_ANAGUMA_MOVE_SPECS: MoveSpec[] = [
   {
-    move: '▲8八銀',
-    hint: '銀を8八に上げます。玉の斜め前を守る穴熊の急所です。🟡の駒を🟢のマスへ動かしてください。',
+    move: '▲7六歩',
+    hint: '角を動かすために7筋の歩を突きます。🟡の駒を🟢のマスへ動かしてください。',
+    from: { col: 7, row: 7 },
+    to: { col: 7, row: 6 },
+  },
+  {
+    move: '▲8六歩',
+    hint: '8筋の歩を突き、銀が使いやすい形にします。',
     from: { col: 8, row: 7 },
+    to: { col: 8, row: 6 },
+  },
+  {
+    move: '▲7七角',
+    hint: '角を7七へ上がり、銀が8八へ入る場所を空けます。',
+    from: { col: 8, row: 8 },
+    to: { col: 7, row: 7 },
+  },
+  {
+    move: '▲8八銀',
+    hint: '銀を8八に上げます。玉の斜め前を守る穴熊の急所です。',
+    from: { col: 7, row: 9 },
     to: { col: 8, row: 8 },
   },
   {
@@ -379,9 +422,21 @@ const IBISHA_ANAGUMA_MOVE_SPECS: MoveSpec[] = [
 // 振り飛車穴熊: 4手 + 完成
 const FURIBISHA_ANAGUMA_MOVE_SPECS: MoveSpec[] = [
   {
-    move: '▲2八銀',
-    hint: '銀を2八に上げます。玉の斜め前を守る振り飛車穴熊の要です。🟡の駒を🟢のマスへ動かしてください。',
+    move: '▲7八飛',
+    hint: '飛車を7八に振り、2八のマスを空けます。🟡の駒を🟢のマスへ動かしてください。',
+    from: { col: 2, row: 8 },
+    to: { col: 7, row: 8 },
+  },
+  {
+    move: '▲2六歩',
+    hint: '2筋の歩を突いて銀の前を空けます。',
     from: { col: 2, row: 7 },
+    to: { col: 2, row: 6 },
+  },
+  {
+    move: '▲2八銀',
+    hint: '銀を2八に上げます。玉の斜め前を守る振り飛車穴熊の要です。',
+    from: { col: 3, row: 9 },
     to: { col: 2, row: 8 },
   },
   {
@@ -442,13 +497,13 @@ export const CASTLES: Castle[] = [
       '▲7八銀',
     ],
     pieces: MINO_PIECES,
-    guidePieces: MINO_GUIDE_PIECES,
-    guideSteps: buildGuideSteps(MINO_GUIDE_PIECES, MINO_MOVE_SPECS),
+    guidePieces: INITIAL_PIECES,
+    guideSteps: buildGuideSteps(INITIAL_PIECES, MINO_MOVE_SPECS),
     guideHighlight: { col: 7, row: 8 },
-    guideNextMove: '▲7八銀',
+    guideNextMove: '▲7六歩',
     guideStep: [6, 10],
     guideProgress: 60,
-    testPieces: MINO_TEST_PIECES,
+    testPieces: INITIAL_PIECES,
     testScore: 85,
     testMessage: 'あと少しで完成！',
     testGoodPoints: [
@@ -478,13 +533,13 @@ export const CASTLES: Castle[] = [
     recommendedAgainst: '持久戦志向の居飛車党',
     basicSteps: ['▲7六歩', '▲6八玉', '▲7八玉', '▲8八玉', '▲7八銀', '▲7七銀'],
     pieces: SIMPLE_CASTLE_PIECES(8, 7, 7, 9),
-    guidePieces: TAKAMINO_GUIDE_PIECES,
-    guideSteps: buildGuideSteps(TAKAMINO_GUIDE_PIECES, TAKAMINO_MOVE_SPECS),
+    guidePieces: INITIAL_PIECES,
+    guideSteps: buildGuideSteps(INITIAL_PIECES, TAKAMINO_MOVE_SPECS),
     guideHighlight: { col: 7, row: 8 },
-    guideNextMove: '▲7八銀',
+    guideNextMove: '▲7六歩',
     guideStep: [5, 8],
     guideProgress: 62,
-    testPieces: MINO_TEST_PIECES,
+    testPieces: INITIAL_PIECES,
     testScore: 80,
     testMessage: 'もう少し！',
     testGoodPoints: ['玉の位置が正しい', '金の配置が良い'],
@@ -506,13 +561,13 @@ export const CASTLES: Castle[] = [
     recommendedAgainst: '居飛車・振り飛車どちらにも',
     basicSteps: ['▲7六歩', '▲6八銀', '▲5七銀', '▲4八玉', '▲3八玉', '▲2八玉'],
     pieces: SIMPLE_CASTLE_PIECES(7, 6, 6, 9),
-    guidePieces: GINKAN_GUIDE_PIECES,
-    guideSteps: buildGuideSteps(GINKAN_GUIDE_PIECES, GINKAN_MOVE_SPECS),
+    guidePieces: INITIAL_PIECES,
+    guideSteps: buildGuideSteps(INITIAL_PIECES, GINKAN_MOVE_SPECS),
     guideHighlight: { col: 6, row: 8 },
-    guideNextMove: '▲6八銀',
+    guideNextMove: '▲7六歩',
     guideStep: [4, 8],
     guideProgress: 50,
-    testPieces: MINO_TEST_PIECES,
+    testPieces: INITIAL_PIECES,
     testScore: 75,
     testMessage: 'あともう一息！',
     testGoodPoints: ['銀の位置が合っている'],
@@ -534,13 +589,13 @@ export const CASTLES: Castle[] = [
     recommendedAgainst: '相居飛車（矢倉戦）',
     basicSteps: ['▲7六歩', '▲6八銀', '▲7七銀', '▲6九玉', '▲7九玉', '▲6八金'],
     pieces: YAGURA_PIECES,
-    guidePieces: YAGURA_GUIDE_PIECES,
-    guideSteps: buildGuideSteps(YAGURA_GUIDE_PIECES, YAGURA_MOVE_SPECS),
+    guidePieces: INITIAL_PIECES,
+    guideSteps: buildGuideSteps(INITIAL_PIECES, YAGURA_MOVE_SPECS),
     guideHighlight: { col: 6, row: 8 },
-    guideNextMove: '▲6八玉',
+    guideNextMove: '▲7六歩',
     guideStep: [7, 12],
     guideProgress: 58,
-    testPieces: MINO_TEST_PIECES,
+    testPieces: INITIAL_PIECES,
     testScore: 70,
     testMessage: 'もう少し頑張ろう！',
     testGoodPoints: ['銀の配置が正しい'],
@@ -562,13 +617,13 @@ export const CASTLES: Castle[] = [
     recommendedAgainst: '速攻志向の相手',
     basicSteps: ['▲7六歩', '▲6八玉', '▲7八玉', '▲5八金右', '▲4八銀', '▲3八銀'],
     pieces: SIMPLE_CASTLE_PIECES(7, 6, 7, 2),
-    guidePieces: FUNE_GUIDE_PIECES,
-    guideSteps: buildGuideSteps(FUNE_GUIDE_PIECES, FUNE_MOVE_SPECS),
+    guidePieces: INITIAL_PIECES,
+    guideSteps: buildGuideSteps(INITIAL_PIECES, FUNE_MOVE_SPECS),
     guideHighlight: { col: 6, row: 8 },
-    guideNextMove: '▲6八金',
+    guideNextMove: '▲6六歩',
     guideStep: [3, 7],
     guideProgress: 43,
-    testPieces: MINO_TEST_PIECES,
+    testPieces: INITIAL_PIECES,
     testScore: 78,
     testMessage: 'いい感じ！',
     testGoodPoints: ['玉の位置が正しい'],
@@ -590,13 +645,13 @@ export const CASTLES: Castle[] = [
     recommendedAgainst: '振り飛車党（対振り飛車で多用）',
     basicSteps: ['▲7六歩', '▲6八玉', '▲7八玉', '▲8八玉', '▲9八玉', '▲8八銀'],
     pieces: SIMPLE_CASTLE_PIECES(9, 8, 8, 2),
-    guidePieces: IBISHA_ANAGUMA_GUIDE_PIECES,
-    guideSteps: buildGuideSteps(IBISHA_ANAGUMA_GUIDE_PIECES, IBISHA_ANAGUMA_MOVE_SPECS),
+    guidePieces: INITIAL_PIECES,
+    guideSteps: buildGuideSteps(INITIAL_PIECES, IBISHA_ANAGUMA_MOVE_SPECS),
     guideHighlight: { col: 9, row: 8 },
-    guideNextMove: '▲9八玉',
+    guideNextMove: '▲7六歩',
     guideStep: [8, 14],
     guideProgress: 57,
-    testPieces: MINO_TEST_PIECES,
+    testPieces: INITIAL_PIECES,
     testScore: 72,
     testMessage: 'あともう少し！',
     testGoodPoints: ['金銀の形が良い'],
@@ -618,13 +673,13 @@ export const CASTLES: Castle[] = [
     recommendedAgainst: '居飛車党（相穴熊も含む）',
     basicSteps: ['▲7六歩', '▲7八飛', '▲6八銀', '▲5八金', '▲4八玉', '▲3八玉'],
     pieces: SIMPLE_CASTLE_PIECES(1, 2, 2, 7),
-    guidePieces: FURIBISHA_ANAGUMA_GUIDE_PIECES,
-    guideSteps: buildGuideSteps(FURIBISHA_ANAGUMA_GUIDE_PIECES, FURIBISHA_ANAGUMA_MOVE_SPECS),
+    guidePieces: INITIAL_PIECES,
+    guideSteps: buildGuideSteps(INITIAL_PIECES, FURIBISHA_ANAGUMA_MOVE_SPECS),
     guideHighlight: { col: 1, row: 8 },
-    guideNextMove: '▲1八玉',
+    guideNextMove: '▲7八飛',
     guideStep: [6, 12],
     guideProgress: 50,
-    testPieces: MINO_TEST_PIECES,
+    testPieces: INITIAL_PIECES,
     testScore: 68,
     testMessage: 'もう少し頑張ろう！',
     testGoodPoints: ['飛車の位置が良い'],

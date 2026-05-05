@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useMemo, useSyncExternalStore } from 'react'
 import Link from 'next/link'
 import BottomNav from '../components/BottomNav'
 import { getLearningRecords } from '../lib/learningRecords'
@@ -8,6 +8,19 @@ import type { LearningRecord } from '../lib/learningRecords'
 import { CASTLES } from '../lib/castles'
 
 const TOTAL_CASTLES = CASTLES.length
+
+function subscribeToLearningRecords(onStoreChange: () => void) {
+  window.addEventListener('storage', onStoreChange)
+  return () => window.removeEventListener('storage', onStoreChange)
+}
+
+function getRecordsSnapshot(): string {
+  return JSON.stringify(getLearningRecords())
+}
+
+function getServerRecordsSnapshot(): string {
+  return '[]'
+}
 
 function formatDate(iso: string): string {
   return new Date(iso).toLocaleDateString('ja-JP', {
@@ -18,13 +31,15 @@ function formatDate(iso: string): string {
 }
 
 export default function RecordsPage() {
-  const [records, setRecords] = useState<LearningRecord[]>([])
-  const [mounted, setMounted] = useState(false)
-
-  useEffect(() => {
-    setMounted(true)
-    setRecords(getLearningRecords())
-  }, [])
+  const recordsSnapshot = useSyncExternalStore(
+    subscribeToLearningRecords,
+    getRecordsSnapshot,
+    getServerRecordsSnapshot,
+  )
+  const records = useMemo(
+    () => JSON.parse(recordsSnapshot) as LearningRecord[],
+    [recordsSnapshot],
+  )
 
   const learned = records.length
   const percent = TOTAL_CASTLES > 0 ? Math.round((learned / TOTAL_CASTLES) * 100) : 0
@@ -46,20 +61,20 @@ export default function RecordsPage() {
           <div className="flex items-center justify-between mb-3">
             <span className="text-sm font-semibold text-gray-700">習得済み囲い</span>
             <span className="text-sm font-bold text-[#7B5E2A]">
-              {mounted ? learned : '-'} / {TOTAL_CASTLES}
+              {learned} / {TOTAL_CASTLES}
             </span>
           </div>
           <div className="h-2.5 bg-gray-100 rounded-full overflow-hidden">
             <div
               className="h-full bg-[#2E7D32] rounded-full transition-all duration-500"
-              style={{ width: mounted ? `${percent}%` : '0%' }}
+              style={{ width: `${percent}%` }}
             />
           </div>
-          <p className="text-xs text-gray-400 mt-1.5 text-right">{mounted ? percent : 0}% 完了</p>
+          <p className="text-xs text-gray-400 mt-1.5 text-right">{percent}% 完了</p>
         </div>
 
         {/* Records list */}
-        {mounted && records.length === 0 ? (
+        {records.length === 0 ? (
           <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 text-center">
             <p className="text-sm text-gray-500 mb-4">まだ学習記録がありません。</p>
             <Link
@@ -94,7 +109,7 @@ export default function RecordsPage() {
         )}
 
         {/* Unlearned castles */}
-        {mounted && records.length > 0 && (
+        {records.length > 0 && (
           <section>
             {(() => {
               const learnedIds = new Set(records.map((r) => r.id))
