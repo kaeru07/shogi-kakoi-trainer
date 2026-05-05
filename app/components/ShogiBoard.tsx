@@ -6,6 +6,8 @@ type Props = {
   pieces: PiecePosition[]
   highlight?: BoardHighlight
   highlightFrom?: BoardHighlight
+  selectedCell?: BoardHighlight
+  onCellClick?: (col: number, row: number) => void
   small?: boolean
 }
 
@@ -23,7 +25,7 @@ function piecesToBoard(pieces: PiecePosition[]): (PiecePosition | null)[][] {
   return board
 }
 
-export default function ShogiBoard({ pieces, highlight, highlightFrom, small = false }: Props) {
+export default function ShogiBoard({ pieces, highlight, highlightFrom, selectedCell, onCellClick, small = false }: Props) {
   const board = piecesToBoard(pieces)
   const labelSize = small ? 'text-[6px]' : 'text-[9px]'
   const labelW = small ? 'w-3' : 'w-4'
@@ -53,12 +55,19 @@ export default function ShogiBoard({ pieces, highlight, highlightFrom, small = f
               const isHighlightFrom = highlightFrom
                 ? highlightFrom.row - 1 === ri && 9 - highlightFrom.col === ci
                 : false
+              const isSelected = selectedCell
+                ? selectedCell.row - 1 === ri && 9 - selectedCell.col === ci
+                : false
+              const col = 9 - ci
+              const row2 = ri + 1
               return (
                 <div
                   key={ci}
+                  onClick={onCellClick ? () => onCellClick(col, row2) : undefined}
                   className={[
                     'flex-1 aspect-square border border-[#A0845C] flex items-center justify-center',
-                    isHighlight ? 'bg-emerald-300' : isHighlightFrom ? 'bg-yellow-200' : 'bg-[#DEB887]',
+                    onCellClick ? 'cursor-pointer' : '',
+                    isSelected ? 'bg-blue-300' : isHighlight ? 'bg-emerald-300' : isHighlightFrom ? 'bg-yellow-200' : 'bg-[#DEB887]',
                   ].join(' ')}
                 >
                   {cell && (

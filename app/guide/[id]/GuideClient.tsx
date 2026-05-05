@@ -14,6 +14,7 @@ type Props = {
 export default function GuideClient({ castle }: Props) {
   const [currentStep, setCurrentStep] = useState(0)
   const [showHint, setShowHint] = useState(false)
+  const [selectedCell, setSelectedCell] = useState<{ col: number; row: number } | null>(null)
 
   const steps = castle.guideSteps
   const totalSteps = steps.length
@@ -34,17 +35,39 @@ export default function GuideClient({ castle }: Props) {
     if (!isLastStep) {
       setCurrentStep(s => s + 1)
       setShowHint(false)
+      setSelectedCell(null)
     }
   }
   const handlePrev = () => {
     if (!isFirstStep) {
       setCurrentStep(s => s - 1)
       setShowHint(false)
+      setSelectedCell(null)
     }
   }
   const handleReset = () => {
     setCurrentStep(0)
     setShowHint(false)
+    setSelectedCell(null)
+  }
+
+  const handleCellClick = (col: number, row: number) => {
+    if (isLastStep) return
+    const from = currentStepData?.from
+    const to = currentStepData?.to
+    if (!from || !to) return
+
+    if (!selectedCell) {
+      if (col === from.col && row === from.row) {
+        setSelectedCell({ col, row })
+      }
+    } else {
+      if (col === to.col && row === to.row) {
+        handleNext()
+      } else {
+        setSelectedCell(col === from.col && row === from.row ? { col, row } : null)
+      }
+    }
   }
 
   return (
@@ -91,6 +114,8 @@ export default function GuideClient({ castle }: Props) {
             pieces={currentStepData?.boardPosition ?? castle.guidePieces}
             highlight={currentStepData?.to ?? currentStepData?.highlight}
             highlightFrom={currentStepData?.from}
+            selectedCell={selectedCell ?? undefined}
+            onCellClick={!isLastStep && currentStepData?.from && currentStepData?.to ? handleCellClick : undefined}
           />
         </div>
 
@@ -111,10 +136,15 @@ export default function GuideClient({ castle }: Props) {
             <div className="text-xs opacity-70 mb-1">次の一手</div>
             <div className="text-2xl font-bold tracking-wider">{currentStepData?.move}</div>
             {currentStepData?.from && currentStepData?.to && (
-              <div className="flex items-center gap-2 mt-2 text-xs opacity-70">
-                <span className="bg-yellow-300 text-yellow-900 px-1.5 py-0.5 rounded font-bold">🟡 動かす駒</span>
-                <span>→</span>
-                <span className="bg-emerald-400 text-emerald-900 px-1.5 py-0.5 rounded font-bold">🟢 移動先</span>
+              <div className="mt-2 space-y-1">
+                <div className="flex items-center gap-2 text-xs opacity-70">
+                  <span className="bg-yellow-300 text-yellow-900 px-1.5 py-0.5 rounded font-bold">🟡 動かす駒</span>
+                  <span>→</span>
+                  <span className="bg-emerald-400 text-emerald-900 px-1.5 py-0.5 rounded font-bold">🟢 移動先</span>
+                </div>
+                <div className="text-xs opacity-60">
+                  {selectedCell ? '移動先（🟢）をタップしてください' : '動かす駒（🟡）をタップしてください'}
+                </div>
               </div>
             )}
           </div>
