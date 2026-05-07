@@ -2,7 +2,11 @@ import Link from 'next/link'
 import { notFound } from 'next/navigation'
 import ShogiBoard from '../../components/ShogiBoard'
 import BottomNav from '../../components/BottomNav'
-import { getCastle } from '../../lib/castles'
+import { getCastle, CASTLES } from '../../lib/castles'
+
+export function generateStaticParams() {
+  return CASTLES.map(c => ({ id: c.id }))
+}
 
 const DIFFICULTY_LABEL: Record<string, string> = {
   easy: '易しい',

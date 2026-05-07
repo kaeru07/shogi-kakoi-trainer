@@ -1,6 +1,10 @@
 import { notFound } from 'next/navigation'
 import GuideClient from './GuideClient'
-import { getCastle } from '../../lib/castles'
+import { getCastle, CASTLES } from '../../lib/castles'
+
+export function generateStaticParams() {
+  return CASTLES.map(c => ({ id: c.id }))
+}
 
 export default async function GuidePage({
   params,

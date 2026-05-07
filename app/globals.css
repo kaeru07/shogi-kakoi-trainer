@@ -13,8 +13,21 @@ body {
   color: #1a1a1a;
   font-family: -apple-system, BlinkMacSystemFont, 'Helvetica Neue', 'Hiragino Sans', 'Noto Sans JP', sans-serif;
   -webkit-font-smoothing: antialiased;
+  -webkit-text-size-adjust: 100%;
+  overscroll-behavior: none;
 }
 
 .pb-safe {
   padding-bottom: calc(60px + env(safe-area-inset-bottom, 0px));
+}
+
+/* Prevent horizontal scroll on mobile */
+html, body {
+  max-width: 100vw;
+  overflow-x: hidden;
+}
+
+/* Improve tap responsiveness */
+button, a {
+  touch-action: manipulation;
 }

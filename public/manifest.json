@@ -1,0 +1,32 @@
+{
+  "name": "囲いトレーナー",
+  "short_name": "囲いトレーナー",
+  "description": "将棋の囲いをステップごとに学べる学習アプリ。美濃囲い・矢倉・穴熊など7種類の囲いをマスターしよう。",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#F5F0E8",
+  "theme_color": "#7B5E2A",
+  "orientation": "portrait",
+  "lang": "ja",
+  "categories": ["education", "games"],
+  "icons": [
+    {
+      "src": "/icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    },
+    {
+      "src": "/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}
