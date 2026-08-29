@@ -39,3 +39,16 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# Android / Capacitor build artifacts (defense in depth — android/.gitignore is primary)
+*.apk
+*.aab
+*.aar
+*.jks
+*.keystore
+keystore.properties
+android/.gradle/
+android/build/
+android/app/build/
+android/captures/
+android/local.properties

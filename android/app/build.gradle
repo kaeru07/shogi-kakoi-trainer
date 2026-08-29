@@ -1,0 +1,96 @@
+apply plugin: 'com.android.application'
+
+android {
+    namespace "com.soneko.shogikakoi"
+    compileSdk rootProject.ext.compileSdkVersion
+    defaultConfig {
+        applicationId "com.soneko.shogikakoi"
+        minSdkVersion rootProject.ext.minSdkVersion
+        targetSdkVersion rootProject.ext.targetSdkVersion
+        versionCode 1
+        versionName "1.0"
+        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+        aaptOptions {
+             // Files and dirs to omit from the packaged assets dir, modified to accommodate modern web apps.
+             // Default: https://android.googlesource.com/platform/frameworks/base/+/282e181b58cf72b6ca770dc7ca5f91f135444502/tools/aapt/AaptAssets.cpp#61
+            ignoreAssetsPattern '!.svn:!.git:!.ds_store:!*.scc:.*:!CVS:!thumbs.db:!picasa.ini:!*~'
+        }
+    }
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+            // After generating a keystore and creating keystore.properties (gitignored),
+            // uncomment the signingConfigs block below and:
+            //   signingConfig signingConfigs.release
+        }
+    }
+
+    // Release signing template — values come from keystore.properties (gitignored).
+    // Activation steps:
+    //   1) keytool -genkeypair -v -keystore /path/to/shogi-release.keystore \
+    //        -alias shogi -keyalg RSA -keysize 2048 -validity 10000
+    //   2) Create app/keystore.properties with:
+    //        storeFile=/absolute/path/to/shogi-release.keystore
+    //        storePassword=...
+    //        keyAlias=shogi
+    //        keyPassword=...
+    //   3) Uncomment the signingConfigs block below AND the
+    //      `signingConfig signingConfigs.release` line in buildTypes.release above.
+    //
+    // signingConfigs {
+    //     release {
+    //         def ksPropsFile = rootProject.file("app/keystore.properties")
+    //         if (ksPropsFile.exists()) {
+    //             def ksProps = new Properties()
+    //             ksPropsFile.withInputStream { ksProps.load(it) }
+    //             storeFile file(ksProps.getProperty("storeFile"))
+    //             storePassword ksProps.getProperty("storePassword")
+    //             keyAlias ksProps.getProperty("keyAlias")
+    //             keyPassword ksProps.getProperty("keyPassword")
+    //         }
+    //     }
+    // }
+}
+
+repositories {
+    flatDir{
+        dirs '../capacitor-cordova-android-plugins/src/main/libs', 'libs'
+    }
+}
+
+dependencies {
+    implementation fileTree(include: ['*.jar'], dir: 'libs')
+    implementation "androidx.appcompat:appcompat:$androidxAppCompatVersion"
+    implementation "androidx.coordinatorlayout:coordinatorlayout:$androidxCoordinatorLayoutVersion"
+    implementation "androidx.core:core-splashscreen:$coreSplashScreenVersion"
+    implementation project(':capacitor-android')
+    testImplementation "junit:junit:$junitVersion"
+    androidTestImplementation "androidx.test.ext:junit:$androidxJunitVersion"
+    androidTestImplementation "androidx.test.espresso:espresso-core:$androidxEspressoCoreVersion"
+    implementation project(':capacitor-cordova-android-plugins')
+}
+
+apply from: 'capacitor.build.gradle'
+
+// Force a single kotlin-stdlib version across modules.
+// capacitor-cordova-android-plugins pulls in kotlin-stdlib-jdk7/jdk8 1.6.21,
+// while capacitor-android pulls in kotlin-stdlib 1.8.22 (which already includes
+// the jdk7/jdk8 classes), causing "Duplicate class" errors at compileDebugJavaWithJavac.
+// Unifying everything to 1.8.22 resolves the collision.
+configurations.all {
+    resolutionStrategy.eachDependency { details ->
+        if (details.requested.group == 'org.jetbrains.kotlin' && details.requested.name.startsWith('kotlin-stdlib')) {
+            details.useVersion '1.8.22'
+        }
+    }
+}
+
+try {
+    def servicesJSON = file('google-services.json')
+    if (servicesJSON.text) {
+        apply plugin: 'com.google.gms.google-services'
+    }
+} catch(Exception e) {
+    logger.info("google-services.json not found, google-services plugin not applied. Push Notifications won't work")
+}

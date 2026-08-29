@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">囲いトレーナー</string>
+    <string name="title_activity_main">囲いトレーナー</string>
+    <string name="package_name">com.soneko.shogikakoi</string>
+    <string name="custom_url_scheme">com.soneko.shogikakoi</string>
+</resources>

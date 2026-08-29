@@ -12,7 +12,7 @@
     "assets": "node scripts/generate-assets.mjs"
   },
   "dependencies": {
-    "@capacitor/cli": "^7.6.2",
+    "@capacitor/android": "^8.3.3",
     "@capacitor/core": "^8.3.1",
     "@capacitor/ios": "^8.3.1",
     "@capacitor/splash-screen": "^8.0.1",
@@ -21,6 +21,7 @@
     "react-dom": "19.2.4"
   },
   "devDependencies": {
+    "@capacitor/cli": "^7.6.2",
     "@tailwindcss/postcss": "^4",
     "@types/node": "^20",
     "@types/react": "^19",
