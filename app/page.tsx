@@ -76,13 +76,6 @@ export default function HomePage() {
           <span className="font-bold text-sm">テストモード</span>
           <span className="text-[10px] opacity-80">完成度をチェック</span>
         </Link>
-        <div className="flex flex-col items-center justify-center bg-gray-300 text-gray-500 rounded-xl py-4 gap-1.5 shadow">
-          <svg viewBox="0 0 24 24" fill="currentColor" className="w-6 h-6">
-            <path d="M18 8h-1V6c0-2.76-2.24-5-5-5S7 3.24 7 6v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2zm-6 9c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2zm3.1-9H8.9V6c0-1.71 1.39-3.1 3.1-3.1 1.71 0 3.1 1.39 3.1 3.1v2z" />
-          </svg>
-          <span className="font-bold text-sm">実戦判断モード</span>
-          <span className="text-[10px]">Coming Soon</span>
-        </div>
       </div>
 
       <BottomNav />
