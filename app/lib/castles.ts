@@ -60,19 +60,17 @@ const MINO_PIECES: PiecePosition[] = [
   { kanji: '香', col: 9, row: 9, isGote: false },
   { kanji: '桂', col: 8, row: 9, isGote: false },
   { kanji: '金', col: 6, row: 9, isGote: false },
-  { kanji: '金', col: 4, row: 9, isGote: false },
   { kanji: '桂', col: 2, row: 9, isGote: false },
   { kanji: '香', col: 1, row: 9, isGote: false },
 ]
 
 const SIMPLE_CASTLE_PIECES = (kingCol: number, goldCol: number, silverCol: number, rookCol: number): PiecePosition[] => [
   ...GOTE_STANDARD,
-  { kanji: '歩', col: 9, row: 7, isGote: false },
+  // 銀が7段目に来る列には歩を置かない（駒の重なり防止）
+  ...[9, 5, 4, 2, 1]
+    .filter((col) => col !== silverCol)
+    .map((col): PiecePosition => ({ kanji: '歩', col, row: 7, isGote: false })),
   { kanji: '銀', col: silverCol, row: 7, isGote: false },
-  { kanji: '歩', col: 5, row: 7, isGote: false },
-  { kanji: '歩', col: 4, row: 7, isGote: false },
-  { kanji: '歩', col: 2, row: 7, isGote: false },
-  { kanji: '歩', col: 1, row: 7, isGote: false },
   { kanji: '飛', col: rookCol, row: 8, isGote: false },
   { kanji: '玉', col: kingCol, row: 8, isGote: false },
   { kanji: '金', col: goldCol, row: 8, isGote: false },
@@ -172,7 +170,7 @@ const MINO_MOVE_SPECS: MoveSpec[] = [
   {
     move: '▲7八金右',
     hint: '右の金を7八に上げます。玉の横に金が並び守りが一段と固まります。',
-    from: { col: 6, row: 8 },
+    from: { col: 6, row: 9 },
     to: { col: 7, row: 8 },
   },
   {
