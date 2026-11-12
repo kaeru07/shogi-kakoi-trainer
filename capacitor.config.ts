@@ -1,7 +1,7 @@
 import type { CapacitorConfig } from '@capacitor/cli'
 
 const config: CapacitorConfig = {
-  appId: 'com.soneko.shogikakoi',
+  appId: 'com.kaeru07.shogikakoi',
   appName: '囲いトレーナー',
   webDir: 'out',
   server: {
