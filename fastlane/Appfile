@@ -1,0 +1,5 @@
+app_identifier("com.soneko.shogikakoi")
+
+# DEVELOPMENT_TEAM is empty in the Xcode project, so the team is
+# supplied from the ASC_TEAM_ID secret when present.
+team_id(ENV["ASC_TEAM_ID"]) if ENV["ASC_TEAM_ID"] && !ENV["ASC_TEAM_ID"].empty?
