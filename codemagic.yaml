@@ -47,6 +47,15 @@ workflows:
           "; }
           echo "== bundle id =="
           BUNDLE_RES_ID=$(app-store-connect list-bundle-ids --bundle-id-identifier "$BUNDLE_ID" --platform IOS --json | json_id)
+          if [ -z "$BUNDLE_RES_ID" ]; then
+            echo "bundle id not registered yet - creating"
+            app-store-connect bundle-ids create "$BUNDLE_ID" --platform IOS || app-store-connect create-bundle-id --bundle-id-identifier "$BUNDLE_ID" --platform IOS
+            BUNDLE_RES_ID=$(app-store-connect list-bundle-ids --bundle-id-identifier "$BUNDLE_ID" --platform IOS --json | json_id)
+          fi
+          if [ -z "$BUNDLE_RES_ID" ]; then
+            echo "ERROR: bundle id resource id could not be resolved"
+            exit 1
+          fi
           echo "bundle id resource: $BUNDLE_RES_ID"
           echo "== distribution certificates =="
           CERT_IDS=$(app-store-connect list-certificates --type DISTRIBUTION --json | json_id || true)
