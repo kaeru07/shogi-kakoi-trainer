@@ -108,11 +108,10 @@ workflows:
         # 同じビルド番号の再アップロードを拒否し "Publishing failed" になる。
         XCODE_PROJECT: "ios/App/App.xcodeproj"
         XCODE_SCHEME: "App"
-      ios_signing:
-        distribution_type: app_store
-        bundle_identifier: "com.kaeru07.shogikakoi"
-        # 自動署名モード: Codemagic が ASC 連携でポータルから
-        # 証明書とプロファイルを自動取得する（保管分の参照名は使わない）。
+      # ios_signing は指定しない。Codemagic 保管分の署名資産に囲い用が無く、
+      # 自動署名モードでも保管分から一致プロファイルを探して失敗するため。
+      # 署名は Set up code signing ステップで ASC 連携の CLI から
+      # ポータルの証明書・プロファイルを直接取得して行う。
 
     scripts:
       - name: Install dependencies
