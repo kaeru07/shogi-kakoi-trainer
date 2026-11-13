@@ -109,11 +109,10 @@ workflows:
         XCODE_PROJECT: "ios/App/App.xcodeproj"
         XCODE_SCHEME: "App"
       ios_signing:
-        certificates:
-          - IOS_DISTRIBUTION_CERTIFICATE
-        # プロファイルは Codemagic 保管分への参照では指定しない。
-        # ポータルに作成済みの "shogi-kakoi-trainer app_store" を
-        # ビルド中に fetch-signing-files で取得する（Set up code signing 参照）。
+        distribution_type: app_store
+        bundle_identifier: "com.kaeru07.shogikakoi"
+        # 自動署名モード: Codemagic が ASC 連携でポータルから
+        # 証明書とプロファイルを自動取得する（保管分の参照名は使わない）。
 
     scripts:
       - name: Install dependencies
