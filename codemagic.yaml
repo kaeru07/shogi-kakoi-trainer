@@ -153,7 +153,7 @@ workflows:
         script: |
           set -e
           xcode-project build-ipa \
-            --project "$XCODE_PROJECT" \
+            --workspace "ios/App/App.xcworkspace" \
             --scheme "$XCODE_SCHEME"
 
     artifacts:
