@@ -111,8 +111,9 @@ workflows:
       ios_signing:
         certificates:
           - IOS_DISTRIBUTION_CERTIFICATE
-        provisioning_profiles:
-          - SHOGI_KAKOI_TRAINER_APP_STORE_PROFILE
+        # プロファイルは Codemagic 保管分への参照では指定しない。
+        # ポータルに作成済みの "shogi-kakoi-trainer app_store" を
+        # ビルド中に fetch-signing-files で取得する（Set up code signing 参照）。
 
     scripts:
       - name: Install dependencies
@@ -141,6 +142,9 @@ workflows:
       - name: Set up code signing
         script: |
           set -e
+          keychain initialize
+          app-store-connect fetch-signing-files "$BUNDLE_ID" --type IOS_APP_STORE
+          keychain add-certificates
           xcode-project use-profiles
           echo "--- provisioning profiles in keychain dir ---"
           ls -1 "$HOME/Library/MobileDevice/Provisioning Profiles" 2>/dev/null || echo "(none)"
