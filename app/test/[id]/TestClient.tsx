@@ -5,15 +5,8 @@ import Link from 'next/link'
 import ShogiBoard from '../../components/ShogiBoard'
 import BottomNav from '../../components/BottomNav'
 import { getValidMoves } from '../../lib/shogiMoves'
+import { calcScore } from '../../lib/score'
 import type { Castle, PiecePosition, BoardHighlight } from '../../lib/types'
-
-function calcScore(current: PiecePosition[], target: PiecePosition[]): number {
-  if (target.length === 0) return 0
-  const matched = target.filter(t =>
-    current.some(p => p.col === t.col && p.row === t.row && p.kanji === t.kanji && p.isGote === t.isGote)
-  ).length
-  return Math.round((matched / target.length) * 100)
-}
 
 type Props = { castle: Castle }
 

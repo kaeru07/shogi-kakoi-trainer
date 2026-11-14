@@ -1,0 +1,31 @@
+# 画面撮影の対象パス（1行に1パス）。# で始まる行はコメント。
+# /guide/{id} は手順データどおりに盤面をクリックして最終手まで進めた状態も撮影する。
+/
+# 囲い一覧・記録・マイページ
+/castles
+/records
+/mypage
+# 各囲いの詳細
+/castles/mino
+/castles/takamino
+/castles/ginkan
+/castles/yagura
+/castles/fune
+/castles/ibisha-anaguma
+/castles/furibisha-anaguma
+# 各囲いの誘導モード
+/guide/mino
+/guide/takamino
+/guide/ginkan
+/guide/yagura
+/guide/fune
+/guide/ibisha-anaguma
+/guide/furibisha-anaguma
+# 各囲いのテストモード
+/test/mino
+/test/takamino
+/test/ginkan
+/test/yagura
+/test/fune
+/test/ibisha-anaguma
+/test/furibisha-anaguma

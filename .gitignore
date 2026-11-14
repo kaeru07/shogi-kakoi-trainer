@@ -52,3 +52,7 @@ android/build/
 android/app/build/
 android/captures/
 android/local.properties
+
+# review-pack working dirs
+/review-out/
+/review-pack-staging/
