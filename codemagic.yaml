@@ -149,6 +149,22 @@ workflows:
           echo "--- provisioning profiles in keychain dir ---"
           ls -1 "$HOME/Library/MobileDevice/Provisioning Profiles" 2>/dev/null || echo "(none)"
 
+      - name: Flatten app icon alpha
+        script: |
+          set -e
+          # Apple検証90717対策: 大型アイコン(AppIcon-512@2x.png)は四隅が透明で
+          # アルファを含むため提出が拒否される。ビルド時に外枠色(#7B5E2A)で
+          # 不透明化してからIPA化する。リポジトリ上の原本は変更しない。
+          python3 -c "import PIL" 2>/dev/null || python3 -m pip install --quiet --user pillow || python3 -m pip install --quiet --user --break-system-packages pillow
+          python3 - <<'PYEOF'
+          from PIL import Image
+          p = "ios/App/App/Assets.xcassets/AppIcon.appiconset/AppIcon-512@2x.png"
+          im = Image.open(p).convert("RGBA")
+          bg = Image.new("RGBA", im.size, (123, 94, 42, 255))
+          Image.alpha_composite(bg, im).convert("RGB").save(p, "PNG")
+          print("icon flattened:", p)
+          PYEOF
+
       - name: Build IPA
         script: |
           set -e
